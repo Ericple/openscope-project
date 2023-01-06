@@ -42,6 +42,7 @@ export class Drawer {
         this.canvasIndex = 1;
         this.canvasPosX = 0;
         this.canvasPosY = 0;
+        //当页面大小被改变时，重新进行绘制
         window.addEventListener('resize', () => {
             this.ClearCanvas();
         });
@@ -247,7 +248,7 @@ export class Drawer {
                     this.canvasContext.beginPath();
                     const coord0 = parse2CoordB(region.coords[0]);
                     const count = region.coords.length;
-                    const line = new Path2D();
+                    // const line = new Path2D();
                     // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
                     this.canvasContext.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
                     for(let index = 0; index < count; index++)

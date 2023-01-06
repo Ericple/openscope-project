@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     if(canvasScreen == null) return;
     sectorbtn?.addEventListener('click', () => {
         ipcRenderer.invoke(ipcChannel.app.update.prfFile);
-    })
+    });
     canvasScreen.addEventListener('wheel', (e) => {
         drawer.UpdateCanvasIndex(e);
     });

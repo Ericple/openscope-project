@@ -15,17 +15,7 @@ export function LoadPrfFile(path: string, callback: (err: NodeJS.ErrnoException 
     if(fs.existsSync(path))
     {
         fs.readFile(path,(err,data)=>{
-            const encodetype = jschardet.detect(data);
-            let decodedData: string[];
-            switch (encodetype.encoding) {
-                case 'UTF-8':
-                    decodedData = data.toString('utf-8').split("\n");
-                    break;
-                default:
-                    decodedData = jschardet.decode(data, 'gbk').split("\n");
-                    break;
-            }
-            decodedData.forEach((line)=>{
+            DecodeData(data).forEach((line)=>{
                 const items = line.split('\t');
                 if(items.length == 3)
                 {
@@ -56,15 +46,7 @@ export function LoadPrfFileSync(path: string) : sectortype.PrfData
     if(fs.existsSync(path))
     {
         let raw: string[] | Buffer = fs.readFileSync(path);
-        const encodetype = jschardet.detect(raw);
-        switch (encodetype.encoding) {
-            case 'UTF-8':
-                raw = raw.toString('utf-8').split("\n");
-                break;
-            default:
-                raw = jschardet.decode(raw, 'gbk').split("\n");
-                break;
-        }
+        raw = DecodeData(raw);
         //之所以不使用forEach是因为forEach特性可能导致提前的返回值
         for (let index = 0; index < raw.length; index++) {
             const line = raw[index];
@@ -97,17 +79,7 @@ export function LoadAsrFile(path: string, callback: (err: NodeJS.ErrnoException 
     if(fs.existsSync(path))
     {
         fs.readFile(path,(err,data)=>{
-            const encodetype = jschardet.detect(data);
-            let decodedData: string[];
-            switch (encodetype.encoding) {
-                case 'UTF-8':
-                    decodedData = data.toString('utf-8').split("\n");
-                    break;
-                default:
-                    decodedData = jschardet.decode(data, 'gbk').split("\n");
-                    break;
-            }
-            decodedData.forEach((line)=>{
+            DecodeData(data).forEach((line)=>{
                 const items = line.split(':');
                 switch (items.length) {
                     case 2:
@@ -158,15 +130,7 @@ export function LoadAsrFileSync(path: string) : sectortype.AsrData
     if(fs.existsSync(path))
     {
         let raw: string[] | Buffer = fs.readFileSync(path);
-        const encodetype = jschardet.detect(raw);
-        switch (encodetype.encoding) {
-            case 'UTF-8':
-                raw = raw.toString('utf-8').split("\n");
-                break;
-            default:
-                raw = jschardet.decode(raw, 'gbk').split("\n");
-                break;
-        }
+        raw = DecodeData(raw);
         //之所以不使用forEach是因为forEach特性可能导致提前的返回值
         for (let index = 0; index < raw.length; index++) {
             const line = raw[index];
@@ -214,16 +178,7 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
     if(fs.existsSync(path))
     {
         fs.readFile(path,(err,data)=>{
-            const encodetype = jschardet.detect(data);
-            let decodedData: string[];
-            switch (encodetype.encoding) {
-                case 'UTF-8':
-                    decodedData = data.toString('utf-8').split("\n");
-                    break;
-                default:
-                    decodedData = jschardet.decode(data, 'gbk').split("\n");
-                    break;
-            }
+            const decodedData = DecodeData(data);
             //读取definitions
             decodedData.forEach((line) => {
                 //跳过注释
@@ -784,16 +739,7 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
     if(fs.existsSync(path))
     {
         const data = fs.readFileSync(path);
-        const encodetype = jschardet.detect(data);
-        let decodedData: string[];
-        switch (encodetype.encoding) {
-            case 'UTF-8':
-                decodedData = data.toString('utf-8').split("\n");
-                break;
-            default:
-                decodedData = jschardet.decode(data, 'gbk').split("\n");
-                break;
-        }
+        const decodedData = DecodeData(data);
         //读取definitions
         decodedData.forEach((line) => {
             //跳过注释
@@ -1409,16 +1355,7 @@ export function LoadEseFile(path: string, callback: (err: NodeJS.ErrnoException 
     if(fs.existsSync(path))
     {
         fs.readFile(path,(err,data) => {
-            const encodetype = jschardet.detect(data);
-            let decodedData: string[];
-            switch (encodetype.encoding) {
-                case 'UTF-8':
-                    decodedData = data.toString('utf-8').split("\n");
-                    break;
-                default:
-                    decodedData = jschardet.decode(data, 'gbk').split("\n");
-                    break;
-            }
+            const decodedData = DecodeData(data);
             let airspacereadflag = false;
             decodedData.forEach((line) => {
                 if(!airspacereadflag)
@@ -1607,16 +1544,7 @@ export function LoadEseFileSync(path: string) : sectortype.EseData
     {
         const result: sectortype.EseData = new sectortype.EseData();
         const data = fs.readFileSync(path);
-        const encodetype = jschardet.detect(data);
-        let decodedData: string[];
-        switch (encodetype.encoding) {
-            case 'UTF-8':
-                decodedData = data.toString('utf-8').split("\n");
-                break;
-            default:
-                decodedData = jschardet.decode(data, 'gbk').split("\n");
-                break;
-        }
+        const decodedData = DecodeData(data);
         let airspacereadflag = false;
         decodedData.forEach((line) => {
             if(!airspacereadflag)
@@ -1897,6 +1825,17 @@ export function ReadSymbol(data: SymbologyDefine[], type: string, flag: string)
         {
             return symbol.data;
         }
+    }
+}
+
+export function DecodeData(data: Buffer) : string[]
+{
+    const encodetype = jschardet.detect(data);
+    switch (encodetype.encoding) {
+        case 'UTF-8':
+            return data.toString('utf-8').split("\n");
+        default:
+            return jschardet.decode(data, 'gbk').split("\n");
     }
 }
 
