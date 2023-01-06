@@ -28,8 +28,8 @@ export function LoadSymbology(path: string, callback: (err: NodeJS.ErrnoExceptio
                         flag: dataline[1],
                         data: {
                             color: hexcolor,
-                            fontSymbolSize: dataline[3],
-                            lineWeight: parseFloat(dataline[4]),
+                            fontSymbolSize: parseFloat(dataline[3]),
+                            lineWeight: parseFloat(dataline[4]) == 0 ? 0.5 : parseFloat(dataline[4]) / 3,
                             lineStyle: parseInt(dataline[5]),
                             alignment: parseInt(dataline[6])
                         }
@@ -83,19 +83,14 @@ export function LoadSymbologySync(path: string) : SymbologyData
             const dataline = line.split(":");
             if(dataline.length == 7)
             {
-                let hexcolor = parseInt(dataline[2]).toString(16);
-                while(hexcolor.length < 6)
-                {
-                    hexcolor = "0" + hexcolor;
-                }
-                hexcolor = "#" + hexcolor;
+                const color = "#" + parseInt(dataline[2]).toString(16).padStart(6,"0");
                 result.colors.push({
                     type: dataline[0],
                     flag: dataline[1],
                     data: {
-                        color: hexcolor,
-                        fontSymbolSize: dataline[3],
-                        lineWeight: parseFloat(dataline[4]),
+                        color: color,
+                        fontSymbolSize: parseFloat(dataline[3]),
+                        lineWeight: parseFloat(dataline[4]) == 0 ? 0.5 : parseFloat(dataline[4]) / 3,
                         lineStyle: parseInt(dataline[5]),
                         alignment: parseInt(dataline[6])
                     }

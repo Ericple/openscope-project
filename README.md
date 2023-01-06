@@ -1,7 +1,7 @@
-# Openscope ![](https://img.shields.io/github/package-json/v/Ericple/openscope-project?style=flat-square)
+# Openscope 
+![](https://img.shields.io/github/package-json/v/Ericple/openscope-project?style=flat-square)
 ![](https://img.shields.io/github/license/Ericple/openscope-project?logo=github&style=flat-square)
 ![](https://img.shields.io/github/issues/Ericple/openscope-project?style=flat-square)
-![](https://img.shields.io/github/languages/code-size/Ericple/openscope-project?style=flat-square)
 ![](https://img.shields.io/github/package-json/dependency-version/Ericple/openscope-project/electron?style=flat-square)
 ![](https://img.shields.io/github/stars/Ericple/openscope-project?style=social)
 
@@ -9,6 +9,13 @@
 
 ![](https://img.shields.io/github/v/release/Ericple/openscope-project?include_prereleases&style=for-the-badge)![](https://img.shields.io/github/downloads/Ericple/openscope-project/total?style=for-the-badge) 
 # [Download](https://github.com/Ericple/openscope-project/releases/latest) 
+
+# Screenshots
+
+![](src/pages/assets/image/Openscope5.png)
+![](src/pages/assets/image/Openscope1.png)
+![](src/pages/assets/image/Openscope2.png)
+
 
 # Contributing
 

@@ -1,12 +1,13 @@
 import { AsrData, EseData, PrfData, SctData } from "../lib/sectortype";
 import elementId from "../lib/elementId";
-import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw } from "./sectorloader";
+import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw, ReadSctAirport, ReadSctVORNDB, ReadSctARTCC, ReadSctSidStar } from "./sectorloader";
 import { VoiceData, SymbologyData, ProfileData } from "../lib/settingtype";
 import { LoadSymbologySync, LoadVoiceSync, LoadProfileSync } from "./settingloader";
 import { parse2CoordB } from "../lib/coordparser";
 import { ipcRenderer } from "electron";
 import ipcChannel from "../lib/ipcChannel";
 import path from 'path';
+import { SctSIDSTAR, SctVorNdb } from "../lib/datatype";
 
 export class Drawer {
     public rootElement: HTMLElement | null;
@@ -34,11 +35,6 @@ export class Drawer {
         this.rootElement = document.getElementById(rootElement);
         if(this.rootElement == undefined) throw "";
         this.rootElement.appendChild(this.canvas);
-        this.canvasContext.lineWidth = 1;
-        this.canvasContext.moveTo(0,0);
-        this.canvasContext.lineTo(100,100);
-        this.canvasContext.strokeStyle = "white";
-        this.canvasContext.stroke()
         this.canvasIndex = 1;
         this.canvasPosX = 0;
         this.canvasPosY = 0;
@@ -48,7 +44,8 @@ export class Drawer {
         });
         //处理扇区选择
         ipcRenderer.on(ipcChannel.app.update.prfFile,(e, args) => {
-            //缓存prf路径
+            const sectorindicator = document.getElementById(elementId.RadarWindow.Appbar.Tags.currentSector);
+            if(sectorindicator !== null) sectorindicator.innerText = path.basename(args.path);
             //更新绘制缓存
             this.UpdateCache(args.path);
             //绘制
@@ -129,7 +126,7 @@ export class Drawer {
             if(!item.draw) return;
             if(this.canvasContext == null) return;
             if(this.sectorCache == undefined || this.symbolCache == undefined || this.eseCache == undefined) return;
-            if(item.type == "Fixes")
+            if(item.type == "Fixes")//绘制fix的symbol或name
             {
                 const origincoord = ReadSctFix(this.sectorCache.fixes, item.name);
                 if(origincoord == undefined) return;
@@ -139,32 +136,33 @@ export class Drawer {
                 this.canvasContext.fillStyle = symbol.color;
                 if(item.flag == "name")
                 {
-                    this.canvasContext.font = parseInt(symbol.fontSymbolSize) * 2.5 + "px Arial";
+                    this.canvasContext.font = symbol.fontSymbolSize * 2.5 + "px Arial";
                     this.canvasContext.fillText(item.name, coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                 }
                 else
                 {
                     //这里的代码后续需要实现DrawScript
-                    const size = parseInt(symbol.fontSymbolSize);
+                    const size = symbol.fontSymbolSize;
                     this.canvasContext.fillRect(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size);
                 }
             }
-            if(item.type == "Free Text")
+            if(item.type == "Free Text")//绘制freetext
             {
                 const groupandtext = item.name.split("\\");
                 const origincoord = ReadEseFreeText(this.eseCache.freetexts, groupandtext[0], groupandtext[1]);
                 const symbol = ReadSymbol(this.symbolCache.colors, "Other", item.flag);
                 if(origincoord == undefined) return;
                 const coord = parse2CoordB(origincoord);
-                if(symbol?.fontSymbolSize == undefined) return;
-                this.canvasContext.font = parseInt(symbol.fontSymbolSize) * 3 + "px Arial";
+                if(symbol == undefined) return;
+                this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
                 this.canvasContext.fillText(groupandtext[1], coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
             }
-            if(item.type == "Geo")
+            if(item.type == "Geo")//绘制地面线
             {
                 const geogroup = ReadSctGeo(this.sectorCache.GEOs, item.name);
-                if(geogroup == undefined) return;
-                this.canvasContext.lineWidth = 0.5;
+                const symbol = ReadSymbol(this.symbolCache.colors, item.type, "line");
+                if(geogroup == undefined || symbol == undefined) return;
+                this.canvasContext.lineWidth = symbol.lineWeight;
                 geogroup.forEach((geo) => {
                     if(this.sectorCache == undefined || this.canvasContext == undefined) return;
                     const colorDef = ReadSctDefine(this.sectorCache.definitions, geo.colorFlag);
@@ -178,7 +176,7 @@ export class Drawer {
                     this.canvasContext.stroke(line);
                 });
             }
-            if(item.type == "High airways")
+            if(item.type == "High airways")//绘制高空航路
             {
                 const aw = ReadSctLoHiAw(this.sectorCache.hiAirways, item.name);
                 // console.log(aw)
@@ -195,18 +193,18 @@ export class Drawer {
                     if(item.flag == "name")
                     {
                         this.canvasContext.fillStyle = symbol.color;
-                        this.canvasContext.font = parseInt(symbol.fontSymbolSize) * 3 + "px Arial";
+                        this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
                         this.canvasContext.fillText(aw.group, (coordA.longtitude * this.canvasIndex + coordB.longtitude * this.canvasIndex) / 2, (coordA.latitude * this.canvasIndex + coordB.latitude * this.canvasIndex) / 2)
                     }
                     else
                     {
-                        this.canvasContext.lineWidth = 0.5;
+                        this.canvasContext.lineWidth = symbol.lineWeight;
                         this.canvasContext.strokeStyle = symbol.color;
                         this.canvasContext.stroke(line);
                     }
                 });
             }
-            if(item.type == "Low airways")
+            if(item.type == "Low airways")//绘制低空航路
             {
                 const aw = ReadSctLoHiAw(this.sectorCache.hiAirways, item.name);
                 // console.log(aw);
@@ -225,13 +223,13 @@ export class Drawer {
                     if(item.flag == "name")
                     {
                         this.canvasContext.fillStyle = symbol.color;
-                        this.canvasContext.font = parseInt(symbol.fontSymbolSize) * 3 + "px Arial";
+                        this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
                         this.canvasContext.fillText(aw.group, (coordA.longtitude * this.canvasIndex + coordB.longtitude * this.canvasIndex) / 2, (coordA.latitude * this.canvasIndex + coordB.latitude * this.canvasIndex) / 2)
                     }
                     else
                     {
-                        this.canvasContext.lineWidth = 0.5;
-                        this.canvasContext.setLineDash([5,10]);
+                        this.canvasContext.lineWidth = symbol.lineWeight;
+                        this.canvasContext.setLineDash([15,25]);
                         this.canvasContext.strokeStyle = symbol.color;
                         this.canvasContext.stroke(line);
                     }
@@ -239,6 +237,14 @@ export class Drawer {
             }
             if(item.type == "Regions")
             {
+                /**
+                 * 这个if内的代码有问题，不知道为什么就是绘制不出来……
+                 * 有没有大佬能够排故？非常感谢
+                 * 我已经在这熬了快六个小时了……
+                 * 目前可以公开的情报：
+                 * 1. 已知所有变量都不为空，不是这个问题
+                 * 2. 没有2了。
+                 */
                 const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);
                 if(regions == undefined) return;
                 regions.items.forEach((region) => {
@@ -260,6 +266,7 @@ export class Drawer {
                     // line.closePath();
                     this.canvasContext.closePath();
                     this.canvasContext.lineWidth = 0.1;
+                    this.canvasContext.strokeStyle = color;
                     this.canvasContext.fillStyle = color;
                     this.canvasContext.stroke();
                     this.canvasContext.fill('nonzero');
@@ -268,7 +275,82 @@ export class Drawer {
                     // this.canvasContext.stroke(line);
                 });
             }
-            
+            // if(item.type == "Runways")
+            // {
+            //     console.log("draw runway here");
+            // }
+            if(item.type == "NDBs" || item.type == "VORs")
+            {
+                let vorndb: SctVorNdb | undefined;
+                if(item.type == "NDBs") vorndb = ReadSctVORNDB(this.sectorCache.ndbs, item.name);
+                if(item.type == "VORs") vorndb = ReadSctVORNDB(this.sectorCache.vors, item.name);
+                if(vorndb == undefined) return;
+                const coord  = parse2CoordB(vorndb.coord);
+                const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
+                if(symbol == undefined) return;
+                this.canvasContext.fillStyle = symbol.color;
+                const size = symbol.fontSymbolSize;
+                this.canvasContext.font = size * 2.2 + "px Arial";
+                if(item.flag == "name")
+                {
+                    this.canvasContext.fillText(vorndb.name, coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                }
+                else
+                {
+                    //这里同样要实现绘制脚本
+                    this.canvasContext.fillRect(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size)
+                }
+            }
+            if(item.type == "Airports")
+            {
+                const airport = ReadSctAirport(this.sectorCache.airports, item.name);
+                if(airport == undefined) return;
+                const coord = parse2CoordB(airport.coord);
+                const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
+                if(symbol == undefined) return;
+                this.canvasContext.fillStyle = symbol.color;
+                const size = symbol.fontSymbolSize;
+                this.canvasContext.font = size * 2.2 + "px Arial";
+                if(item.flag == "name")
+                {
+                    this.canvasContext.fillText(airport.icao, coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                }
+                else
+                {
+                    this.canvasContext.fillRect(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size);
+                }
+            }
+            if(item.type == "ARTCC boundary")
+            {
+                const artcc = ReadSctARTCC(this.sectorCache.ARTCCs, item.name);
+                const symbol = ReadSymbol(this.symbolCache.colors, item.type, "line");
+                if(symbol == undefined || artcc == undefined) return;
+                this.canvasContext.lineWidth = symbol.lineWeight;
+                this.canvasContext.strokeStyle = symbol.color;
+                artcc.coords.forEach((coord) => {
+                    const line = new Path2D();
+                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
+                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
+                    this.canvasContext?.stroke(line);
+                });
+            }
+            if(item.type == "Sids" || item.type == "Stars")
+            {
+                let sidstar: SctSIDSTAR | undefined;
+                if(item.type == "Sids") sidstar = ReadSctSidStar(this.sectorCache.sids, item.name);
+                if(item.type == "Stars") sidstar = ReadSctSidStar(this.sectorCache.stars, item.name);
+                const symbol = ReadSymbol(this.symbolCache.colors, item.type, "line");
+                if(sidstar == undefined || symbol == undefined) return;
+                this.canvasContext.lineWidth = symbol.lineWeight;
+                this.canvasContext.strokeStyle = symbol.color;
+                this.canvasContext.setLineDash([1, 5]);
+                sidstar.coords.forEach((coordpair) => {
+                    const line = new Path2D();
+                    line.moveTo(coordpair.coordA.longtitude * this.canvasIndex, coordpair.coordA.latitude * this.canvasIndex);
+                    line.lineTo(coordpair.coordB.longtitude * this.canvasIndex, coordpair.coordB.latitude * this.canvasIndex);
+                    this.canvasContext?.stroke(line);
+                });
+            }
         });
     }
 }

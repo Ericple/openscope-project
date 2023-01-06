@@ -1,6 +1,7 @@
 import fs from "fs";
 import * as jschardet from "iconv-jschardet";
-import { Coordinate_A, EseFreetext, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SymbologyDefine } from "../lib/datatype";
+import { parse2CoordB } from "../lib/coordparser";
+import { Coordinate_A, EseFreetext, SctAirport, SctARTCC, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SctSIDSTAR, SctVorNdb, SymbologyDefine } from "../lib/datatype";
 import * as sectortype from "../lib/sectortype";
 import spaceformatter from "../lib/spaceformatter";
 
@@ -185,15 +186,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                 if(line.lastIndexOf(";") !== -1) line = line.split(";")[0];
                 if(line.startsWith("#define"))
                 {
-                    const datas = line.split(" ");
-                    let color = parseInt(datas[2]).toString(16);
-                    while(color.length < 6)
-                    {
-                        color = "0" + color;
-                    }
+                    const dataline = line.split(" ");
+                    const color = "#" + parseInt(dataline[2]).toString(16).padStart(6,"0");
                     result.definitions.push({
-                        flag: datas[1],
-                        color: "#" + color
+                        flag: dataline[1],
+                        color: color
                     });
                 }
             });
@@ -400,19 +397,79 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         group += dataline[i] + " ";
                     }
                     //去除末尾多余空格
-                    group = group.trim()
-                    result.ARTCCs.push({
-                        group: group,
-                        coordA: {
-                            latitude: dataline[linelen - 4],
-                            longitude: dataline[linelen - 3]
-                        },
-                        coordB: {
-                            latitude: dataline[linelen - 2],
-                            longitude: dataline[linelen - 1]
-                        },
-                        
-                    });
+                    group = group.trim();
+                    if(result.ARTCCs.length == 0)
+                    {
+                        result.ARTCCs.push({
+                            group: group,
+                            coords: [{
+                                coordA: parse2CoordB({
+                                    latitude: dataline[linelen - 4],
+                                    longitude: dataline[linelen - 3]
+                                }),
+                                coordB: parse2CoordB({
+                                    latitude: dataline[linelen - 2],
+                                    longitude: dataline[linelen - 1]
+                                }),
+                                // coordA: {
+                                //     latitude: dataline[linelen - 4],
+                                //     longitude: dataline[linelen - 3]
+                                // },
+                                // coordB: {
+                                //     latitude: dataline[linelen - 2],
+                                //     longitude: dataline[linelen - 1]
+                                // },
+                            }]
+                        });
+                    }
+                    else
+                    {
+                        if(group == result.ARTCCs[result.ARTCCs.length - 1].group)
+                        {
+                            result.ARTCCs[result.ARTCCs.length - 1].coords.push({
+                                coordA: parse2CoordB({
+                                    latitude: dataline[linelen - 4],
+                                    longitude: dataline[linelen - 3]
+                                }),
+                                coordB: parse2CoordB({
+                                    latitude: dataline[linelen - 2],
+                                    longitude: dataline[linelen - 1]
+                                }),
+                                // coordA: {
+                                //     latitude: dataline[linelen - 4],
+                                //     longitude: dataline[linelen - 3]
+                                // },
+                                // coordB: {
+                                //     latitude: dataline[linelen - 2],
+                                //     longitude: dataline[linelen - 1]
+                                // },
+                            })
+                        }
+                        else
+                        {
+                            result.ARTCCs.push({
+                                group: group,
+                                coords: [{
+                                    coordA: parse2CoordB({
+                                        latitude: dataline[linelen - 4],
+                                        longitude: dataline[linelen - 3]
+                                    }),
+                                    coordB: parse2CoordB({
+                                        latitude: dataline[linelen - 2],
+                                        longitude: dataline[linelen - 1]
+                                    })
+                                    // coordA: {
+                                    //     latitude: dataline[linelen - 4],
+                                    //     longitude: dataline[linelen - 3]
+                                    // },
+                                    // coordB: {
+                                    //     latitude: dataline[linelen - 2],
+                                    //     longitude: dataline[linelen - 1]
+                                    // }
+                                }]
+                            });
+                        }
+                    }
                 }
             });
             let SIDreadflag = false;
@@ -439,31 +496,31 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     if(dataline.length == 5)
                     {
                         result.sids.push({
-                            ident: dataline[0],
-                            coordA: {
-                                latitude: dataline[1],
-                                longitude: dataline[2]
-                            },
-                            coordB: {
-                                latitude: dataline[3],
-                                longitude: dataline[4]
-                            },
-                            
+                            group: dataline[0],
+                            coords: [{
+                                coordA: parse2CoordB({
+                                    latitude: dataline[1],
+                                    longitude: dataline[2]
+                                }),
+                                coordB: parse2CoordB({
+                                    latitude: dataline[3],
+                                    longitude: dataline[4]
+                                }),
+                            }]
                         });
                     }
                     else
                     {
-                        result.sids.push({
-                            ident: result.sids[result.sids.length-1].ident,
-                            coordA: {
-                                latitude: dataline[1],
-                                longitude: dataline[2]
-                            },
-                            coordB: {
-                                latitude: dataline[3],
-                                longitude: dataline[4]
-                            },
-                        });
+                        result.sids[result.sids.length - 1].coords.push({
+                            coordA: parse2CoordB({
+                                latitude: dataline[0],
+                                longitude: dataline[1]
+                            }),
+                            coordB: parse2CoordB({
+                                latitude: dataline[2],
+                                longitude: dataline[3]
+                            })
+                        })
                     }
                 }
             });
@@ -490,33 +547,32 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     const dataline = line.split(" ");
                     if(dataline.length == 5)
                     {
-                        result.sids.push({
-                            ident: dataline[0],
-                            coordA: {
-                                latitude: dataline[1],
-                                longitude: dataline[2]
-                            },
-                            coordB: {
-                                latitude: dataline[3],
-                                longitude: dataline[4]
-                            },
-                            
+                        result.stars.push({
+                            group: dataline[0],
+                            coords: [{
+                                coordA: parse2CoordB({
+                                    latitude: dataline[1],
+                                    longitude: dataline[2]
+                                }),
+                                coordB: parse2CoordB({
+                                    latitude: dataline[3],
+                                    longitude: dataline[4]
+                                }),
+                            }]
                         });
                     }
                     else
                     {
-                        result.stars.push({
-                            ident: result.sids[result.sids.length-1].ident,
-                            coordA: {
-                                latitude: dataline[1],
-                                longitude: dataline[2]
-                            },
-                            coordB: {
-                                latitude: dataline[3],
-                                longitude: dataline[4]
-                            },
-                            
-                        });
+                        result.stars[result.stars.length - 1].coords.push({
+                            coordA: parse2CoordB({
+                                latitude: dataline[0],
+                                longitude: dataline[1]
+                            }),
+                            coordB: parse2CoordB({
+                                latitude: dataline[2],
+                                longitude: dataline[3]
+                            })
+                        })
                     }
                 }
             });
@@ -747,14 +803,10 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
             if(line.startsWith("#define"))
             {
                 const dataline = line.split(" ");
-                let color = parseInt(dataline[2]).toString(16);
-                while(color.length < 6)
-                {
-                    color = "0" + color;
-                }
+                const color = "#" + parseInt(dataline[2]).toString(16).padStart(6,"0");
                 result.definitions.push({
                     flag: dataline[1],
-                    color: "#" + color
+                    color: color
                 });
             }
         });
@@ -964,18 +1016,54 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                 }
                 //去除末尾多余空格
                 group = group.trim()
-                result.ARTCCs.push({
-                    group: group,
-                    coordA: {
-                        latitude: dataline[linelen - 4],
-                        longitude: dataline[linelen - 3]
-                    },
-                    coordB: {
-                        latitude: dataline[linelen - 2],
-                        longitude: dataline[linelen - 1]
-                    },
-                    
-                });
+                if(result.ARTCCs.length == 0)
+                {
+                    result.ARTCCs.push({
+                        group: group,
+                        coords: [{
+                            coordA: parse2CoordB({
+                                latitude: dataline[linelen - 4],
+                                longitude: dataline[linelen - 3]
+                            }),
+                            coordB: parse2CoordB({
+                                latitude: dataline[linelen - 2],
+                                longitude: dataline[linelen - 1]
+                            })
+                        }]
+                    });
+                }
+                else
+                {
+                    if(group == result.ARTCCs[result.ARTCCs.length - 1].group)
+                    {
+                        result.ARTCCs[result.ARTCCs.length - 1].coords.push({
+                            coordA: parse2CoordB({
+                                latitude: dataline[linelen - 4],
+                                longitude: dataline[linelen - 3]
+                            }),
+                            coordB: parse2CoordB({
+                                latitude: dataline[linelen - 2],
+                                longitude: dataline[linelen - 1]
+                            })
+                        })
+                    }
+                    else
+                    {
+                        result.ARTCCs.push({
+                            group: group,
+                            coords: [{
+                                coordA: parse2CoordB({
+                                    latitude: dataline[linelen - 4],
+                                    longitude: dataline[linelen - 3]
+                                }),
+                                coordB: parse2CoordB({
+                                    latitude: dataline[linelen - 2],
+                                    longitude: dataline[linelen - 1]
+                                })
+                            }]
+                        });
+                    }
+                }
             }
         });
         let SIDreadflag = false;
@@ -1000,35 +1088,34 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                 //读取
                 const dataline = line.split(" ");
                 if(dataline.length == 5)
-                {
-                    result.sids.push({
-                        ident: dataline[0],
-                        coordA: {
-                            latitude: dataline[1],
-                            longitude: dataline[2]
-                        },
-                        coordB: {
-                            latitude: dataline[3],
-                            longitude: dataline[4]
-                        },
-                        
-                    });
-                }
-                else
-                {
-                    result.sids.push({
-                        ident: result.sids[result.sids.length-1].ident,
-                        coordA: {
-                            latitude: dataline[1],
-                            longitude: dataline[2]
-                        },
-                        coordB: {
-                            latitude: dataline[3],
-                            longitude: dataline[4]
-                        },
-                        
-                    });
-                }
+                    {
+                        result.sids.push({
+                            group: dataline[0],
+                            coords: [{
+                                coordA: parse2CoordB({
+                                    latitude: dataline[1],
+                                    longitude: dataline[2]
+                                }),
+                                coordB: parse2CoordB({
+                                    latitude: dataline[3],
+                                    longitude: dataline[4]
+                                }),
+                            }]
+                        });
+                    }
+                    else
+                    {
+                        result.sids[result.sids.length - 1].coords.push({
+                            coordA: parse2CoordB({
+                                latitude: dataline[0],
+                                longitude: dataline[1]
+                            }),
+                            coordB: parse2CoordB({
+                                latitude: dataline[2],
+                                longitude: dataline[3]
+                            })
+                        })
+                    }
             }
         });
         let STARreadflag = false;
@@ -1054,33 +1141,32 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                 const dataline = line.split(" ");
                 if(dataline.length == 5)
                 {
-                    result.sids.push({
-                        ident: dataline[0],
-                        coordA: {
-                            latitude: dataline[1],
-                            longitude: dataline[2]
-                        },
-                        coordB: {
-                            latitude: dataline[3],
-                            longitude: dataline[4]
-                        },
-                        
+                    result.stars.push({
+                        group: dataline[0],
+                        coords: [{
+                            coordA: parse2CoordB({
+                                latitude: dataline[1],
+                                longitude: dataline[2]
+                            }),
+                            coordB: parse2CoordB({
+                                latitude: dataline[3],
+                                longitude: dataline[4]
+                            }),
+                        }]
                     });
                 }
                 else
                 {
-                    result.stars.push({
-                        ident: result.sids[result.sids.length-1].ident,
-                        coordA: {
-                            latitude: dataline[1],
-                            longitude: dataline[2]
-                        },
-                        coordB: {
-                            latitude: dataline[3],
-                            longitude: dataline[4]
-                        },
-                        
-                    });
+                    result.stars[result.stars.length - 1].coords.push({
+                        coordA: parse2CoordB({
+                            latitude: dataline[0],
+                            longitude: dataline[1]
+                        }),
+                        coordB: parse2CoordB({
+                            latitude: dataline[2],
+                            longitude: dataline[3]
+                        })
+                    })
                 }
             }
         });
@@ -1730,10 +1816,7 @@ export function ReadPrfData(data: sectortype.PrfData, flag: string) : string | u
 {
     for (let index = 0; index < data.settings.length; index++) {
         const item = data.settings[index];
-        if(index < data.settings.length && item.flag == flag)
-        {
-            return item.data.substring(0, item.data.length - 1);
-        }
+        if(index < data.settings.length && item.flag == flag) return item.data.substring(0, item.data.length - 1);
     }
 }
 
@@ -1755,10 +1838,7 @@ export function ReadSctDefine(data: SctDefinition[], flag: string) : string | un
 {
     for (let index = 0; index < data.length; index++) {
         const definition = data[index];
-        if(definition.flag == flag)
-        {
-            return definition.color;
-        }
+        if(definition.flag == flag) return definition.color;
     }
 }
 
@@ -1766,10 +1846,7 @@ export function ReadSctFix(data: SctFix[], name: string) : Coordinate_A | undefi
 {
     for (let index = 0; index < data.length; index++) {
         const fix = data[index];
-        if(fix.name == name)
-        {
-            return fix.coord;
-        }
+        if(fix.name == name) return fix.coord;
     }
 }
 
@@ -1777,10 +1854,7 @@ export function ReadEseFreeText(data: EseFreetext[], group: string, text: string
 {
     for (let index = 0; index < data.length; index++) {
         const freetext = data[index];
-        if(freetext.group == group && freetext.text == text)
-        {
-            return freetext.coord;
-        }
+        if(freetext.group == group && freetext.text == text) return freetext.coord;
     }
 }
 
@@ -1788,10 +1862,7 @@ export function ReadSctGeo(data: SctGEO[], group: string)
 {
     for (let index = 0; index < data.length; index++) {
         const geo = data[index];
-        if(geo.group == group)
-        {
-            return geo.items;
-        }
+        if(geo.group == group) return geo.items;
     }
 }
 
@@ -1799,10 +1870,15 @@ export function ReadSctRegions(data: SctREGIONS[], group: string)
 {
     for (let index = 0; index < data.length; index++) {
         const region = data[index];
-        if(region.group == group)
-        {
-            return region;
-        }
+        if(region.group == group) return region;
+    }
+}
+
+export function ReadSctAirport(data: SctAirport[], icao: string)
+{
+    for (let index = 0; index < data.length; index++) {
+        const airport = data[index];
+        if(airport.icao == icao) return airport;
     }
 }
 
@@ -1810,10 +1886,31 @@ export function ReadSctLoHiAw(data: SctLoHiAirway[], group: string)
 {
     for (let index = 0; index < data.length; index++) {
         const airway = data[index];
-        if(airway.group == group)
-        {
-            return airway;
-        }
+        if(airway.group == group) return airway;
+    }
+}
+
+export function ReadSctSidStar(data: SctSIDSTAR[], group: string)
+{
+    for (let index = 0; index < data.length; index++) {
+        const sidstar = data[index];
+        if(sidstar.group == group) return sidstar;
+    }
+}
+
+export function ReadSctVORNDB(data: SctVorNdb[], name: string)
+{
+    for (let index = 0; index < data.length; index++) {
+        const vorndb = data[index];
+        if(vorndb.name == name) return vorndb;
+    }
+}
+
+export function ReadSctARTCC(data: SctARTCC[], group: string)
+{
+    for (let index = 0; index < data.length; index++) {
+        const artcc = data[index];
+        if(artcc.group == group) return artcc;
     }
 }
 
@@ -1821,10 +1918,7 @@ export function ReadSymbol(data: SymbologyDefine[], type: string, flag: string)
 {
     for (let index = 0; index < data.length; index++) {
         const symbol = data[index];
-        if(symbol.type == type && symbol.flag == flag)
-        {
-            return symbol.data;
-        }
+        if(symbol.type == type && symbol.flag == flag) return symbol.data;
     }
 }
 

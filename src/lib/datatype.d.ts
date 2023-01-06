@@ -108,15 +108,24 @@ export type SctFix = {
 }
 export type SctARTCC = {
     group: string,
-    coordA: Coordinate_A,
-    coordB: Coordinate_A,
-    
+    coords: {
+        coordA: Coordinate_B,
+        coordB: Coordinate_B,
+    }[]
 }
+// export type SctARTCC = {
+//     group: string,
+//     coords: {
+//         coordA: Coordinate_A,
+//         coordB: Coordinate_A,
+//     }[]
+// }
 export type SctSIDSTAR = {
-    ident: string,
-    coordA: Coordinate_A,
-    coordB: Coordinate_A,
-    
+    group: string,
+    coords: {
+        coordA: Coordinate_B,
+        coordB: Coordinate_B,
+    }[]
 }
 export type SctLoHiAirway = {
     group: string,
@@ -206,7 +215,7 @@ export type SymbologyDefine = {
     flag: string,
     data: {
         color: string,
-        fontSymbolSize: string,
+        fontSymbolSize: number,
         lineWeight: number,
         lineStyle: number,
         alignment: number
