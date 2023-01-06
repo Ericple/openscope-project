@@ -1189,6 +1189,22 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                             },
                         })
                     }
+                    else
+                    {
+                        result.loAirways.push({
+                            group: dataline[0],
+                            coords: [{
+                                coordA: {
+                                    latitude: dataline[1],
+                                    longitude: dataline[2]
+                                },
+                                coordB: {
+                                    latitude: dataline[3],
+                                    longitude: dataline[4]
+                                },
+                            }]
+                        });
+                    }
                 }
             }
         });
@@ -1242,6 +1258,22 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                                 longitude: dataline[4]
                             },
                         })
+                    }
+                    else
+                    {
+                        result.hiAirways.push({
+                            group: dataline[0],
+                            coords: [{
+                                coordA: {
+                                    latitude: dataline[1],
+                                    longitude: dataline[2]
+                                },
+                                coordB: {
+                                    latitude: dataline[3],
+                                    longitude: dataline[4]
+                                },
+                            }]
+                        });
                     }
                 }
             }
@@ -1849,10 +1881,10 @@ export function ReadSctRegions(data: SctREGIONS[], group: string)
 export function ReadSctLoHiAw(data: SctLoHiAirway[], group: string)
 {
     for (let index = 0; index < data.length; index++) {
-        const runway = data[index];
-        if(runway.group == group)
+        const airway = data[index];
+        if(airway.group == group)
         {
-            return runway;
+            return airway;
         }
     }
 }

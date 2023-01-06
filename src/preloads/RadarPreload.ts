@@ -43,18 +43,9 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     });
     setInterval(function(){
         const date = new Date();
-        const hrs = date.getUTCHours();
-        let hrsDisplay = hrs.toString();
-        if(hrs<10) hrsDisplay = "0" + hrs.toString();
-        const min = date.getUTCMinutes();
-        let minDisplay = min.toString();
-        if(min<10) minDisplay="0"+min.toString();
-        const sec = date.getUTCSeconds();
-        let secDisplay = sec.toString();
-        if(sec<10) secDisplay="0"+sec.toString();
-        if(timeIndicator !== null)
-        {
-            timeIndicator.innerText=`${hrsDisplay}:${minDisplay}:${secDisplay}`;
-        }
+        const hrs = date.getUTCHours().toString().padStart(2,"0");
+        const min = date.getUTCMinutes().toString().padStart(2,"0");
+        const sec = date.getUTCSeconds().toString().padStart(2,"0");
+        if(timeIndicator !== null) timeIndicator.innerText=`${hrs}:${min}:${sec}`;
     }, 1000);
 });

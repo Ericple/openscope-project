@@ -180,6 +180,7 @@ export class Drawer {
             if(item.type == "High airways")
             {
                 const aw = ReadSctLoHiAw(this.sectorCache.hiAirways, item.name);
+                // console.log(aw)
                 if(aw == undefined) return;
                 aw.coords.forEach(coord => {
                     const coordA = parse2CoordB(coord.coordA);
@@ -193,7 +194,7 @@ export class Drawer {
                     if(item.flag == "name")
                     {
                         this.canvasContext.fillStyle = symbol.color;
-                        this.canvasContext.font = symbol.fontSymbolSize + "px Arial";
+                        this.canvasContext.font = parseInt(symbol.fontSymbolSize) * 3 + "px Arial";
                         this.canvasContext.fillText(aw.group, (coordA.longtitude * this.canvasIndex + coordB.longtitude * this.canvasIndex) / 2, (coordA.latitude * this.canvasIndex + coordB.latitude * this.canvasIndex) / 2)
                     }
                     else
@@ -207,12 +208,15 @@ export class Drawer {
             if(item.type == "Low airways")
             {
                 const aw = ReadSctLoHiAw(this.sectorCache.hiAirways, item.name);
+                // console.log(aw);
                 if(aw == undefined) return;
                 aw.coords.forEach(coord => {
                     const coordA = parse2CoordB(coord.coordA);
                     const coordB = parse2CoordB(coord.coordB);
+                    // console.log("trying to draw loaw...",coordA.latitude,coordA.longtitude,coordB.latitude,coordB.longtitude)
                     if(coordA == undefined || coordB == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
                     const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
+                    console.log(symbol);
                     if(symbol == undefined) return;
                     const line = new Path2D();
                     line.moveTo(coordA.longtitude * this.canvasIndex, coordA.latitude * this.canvasIndex);
@@ -220,12 +224,13 @@ export class Drawer {
                     if(item.flag == "name")
                     {
                         this.canvasContext.fillStyle = symbol.color;
-                        this.canvasContext.font = symbol.fontSymbolSize + "px Arial";
+                        this.canvasContext.font = parseInt(symbol.fontSymbolSize) * 3 + "px Arial";
                         this.canvasContext.fillText(aw.group, (coordA.longtitude * this.canvasIndex + coordB.longtitude * this.canvasIndex) / 2, (coordA.latitude * this.canvasIndex + coordB.latitude * this.canvasIndex) / 2)
                     }
                     else
                     {
                         this.canvasContext.lineWidth = 0.5;
+                        this.canvasContext.setLineDash([5,10]);
                         this.canvasContext.strokeStyle = symbol.color;
                         this.canvasContext.stroke(line);
                     }
@@ -251,9 +256,11 @@ export class Drawer {
                         // line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                         this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                     }
-                    line.closePath();
+                    // line.closePath();
+                    this.canvasContext.closePath();
                     this.canvasContext.lineWidth = 0.1;
                     this.canvasContext.fillStyle = color;
+                    this.canvasContext.stroke();
                     this.canvasContext.fill('nonzero');
                     // console.log("normally drawed",region.colorFlag);
                     // this.canvasContext.strokeStyle = color;
