@@ -1,0 +1,38 @@
+{
+  "name": "openscope-project",
+  "version": "0.2.0",
+  "description": "open source successor of euroscope power of control",
+  "main": "./dist/main.js",
+  "scripts": {
+    "test": "electron ./dist/main.js",
+    "compile": "tsc",
+    "updateassets": "ts-node CopyAssets.ts",
+    "start": "npm run compile && npm run updateassets && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenVMSys/openscope-project.git"
+  },
+  "keywords": [
+    "controller",
+    "euroscope",
+    "openvmsys"
+  ],
+  "author": "Guo Tingjin",
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "bugs": {
+    "url": "https://github.com/OpenVMSys/openscope-project/issues"
+  },
+  "homepage": "https://github.com/OpenVMSys/openscope-project#readme",
+  "devDependencies": {
+    "@types/shelljs": "^0.8.11",
+    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/parser": "^5.48.0",
+    "eslint": "^8.31.0",
+    "shelljs": "^0.8.5"
+  },
+  "dependencies": {
+    "electron": "^19.1.9",
+    "iconv-jschardet": "^2.0.32"
+  }
+}

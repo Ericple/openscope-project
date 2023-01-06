@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenScope - The Cross Platform Controller Terminal</title>
+    <link rel="stylesheet" href="../css/win.css">
+</head>
+<body>
+    <div id="app-bar" class="app-bar">
+        <button class="appbar-menu-item" id="button-connect" title="CONNECT"></button>
+        <a class="appbar-menu-item" title="CALLSIGN(RATING)" id="appbar-connection-info">----_---(---)</a>
+        <button class="appbar-menu-item" id="button-output" title="COMM SETTINGS"></button>
+        <a class="appbar-menu-item" title="FREQUENCY" id="appbar-frequency">199.998</a>
+        <button class="appbar-menu-item" id="button-atis" title="ATIS CONFIG"></button>
+        <a class="appbar-menu-item" title="ATIS INFO" id="appbar-atis-info">(-) ---.---</a>
+        <button class="appbar-menu-item" id="button-display" title="DISPLAY"></button>
+        <a class="appbar-menu-item" title="CURRENT TIME" id="appbar-utc-time"></a>
+        <button class="appbar-menu-item" id="button-runway" title="RUNWAY SETTINGS"></button>
+        <button class="appbar-menu-item" id="button-select-sector" title="SELECT SECTOR FILE"></button>
+        <a class="appbar-menu-item" title="CURRENT SECTOR" id="appbar-current-sector"></a>
+        <button class="appbar-menu-item" id="button-setting" title="SETTINGS"></button>
+        <a class="appbar-menu-item" title="VIEW COORDINATE" id="appbar-coordinate"></a>
+        <button class="appbar-win-control" id="button-close-app"></button>
+        <button class="appbar-win-control" id="button-restore-app"></button>
+        <button class="appbar-win-control" id="button-minimize-app"></button>
+    </div>
+    <div id="footer-tool" class="footer-tool">
+        <div class="footer-channel-chooser" id="footer-channel-chooser">
+            <a class="channel">server</a>
+            <a class="channel">Message</a>
+        </div>
+        <div class="footer-channel-message" id="footer-channel-message-container">
+            <a class="footer-message">[10:50:00] Info: You have the latest alpha release</a>
+        </div>
+        <div class="footer-tool-item" id="tool-bar">
+            <a class="tool-bar-label">Message</a>
+            <input type="text" id="tool-bar-messagebox" class="tool-bar-messagebox" spellcheck="false">
+        </div>
+    </div>
+    <div id="app"></div>
+    <script src="../script/RadarWindow.js"></script>
+</body>
+</html>

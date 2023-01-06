@@ -1,0 +1,5 @@
+/.VSCodeCounter
+/.vscode
+/dist
+/node_modules
+/test.ts

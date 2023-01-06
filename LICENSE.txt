@@ -1,0 +1,30 @@
+                   OPENSCOPE DEVELOPMENT LICENSE 
+                       Version 1, 5 Jan 2023
+
+   Copyright (C) 2023 Ericple Guo. Website: <https://peercat.cn/>
+
+                              PREAMBLE
+
+I wrote this software mainly for those linux user who want to be a 
+controller but restricted by windows based Euroscope controller 
+software. This software instead, supports Windows / Linux / macOS. I
+made it open source because I want to grow a community of controller,
+in which there are all people full of passion for challenge, and have
+the courage to break free.
+
+                        TERMS AND CONDITIONS
+
+0.Definition
+
+<Me> refers to <Ericple Guo>, which is the owner of the copyright.
+<THIS SOFTWARE> refers to <Openscope>
+
+THIS SOFTWARE IS OPEN SOURCE, YOU CANMODIFY / RECOMPILE / REDISTRIBUTE 
+THE SOURCE CODE BY OBEYING THE FOLLOWING TERMS:
+
+1. YOU CAN NOT REMOVE OR MODIFY THIS LICENSE FILE FROM YOUR REDISTRIBUTION.
+2. KEEP THE SOURCE CODE CLEAN AND STILL OPEN, THIS SOFTWARESHOULD NOT 
+BE CLOSED SOURCE.
+3. THIS SOFTWARE IS NOT PARTICULARLY DESIGNED FOR COMMERCIAL USE, IF 
+ANY COMPANY OR ORGANIZATION WANT TO TAKE IT FOR COMMERCIAL USE, THEY WOULD
+NEED THE COPYRIGHT FROM ME.
