@@ -14,9 +14,9 @@
 
 All contributions are welcomed. Before forking this repository, please consider the followings:
 
-- Are you familier with [TypeScript](https://www.typescriptlang.org/) and [Electron](https://electronjs.org/)?
-- Are you familier with [Euroscope](https://www.euroscope.hu/wp/) and its config files?
-- Do you know the basic knowledge of ATC?
+- Am I familier with [TypeScript](https://www.typescriptlang.org/) and [Electron](https://electronjs.org/)?
+- Am I you familier with [Euroscope](https://www.euroscope.hu/wp/) and its config files?
+- Do I know the basic knowledge of ATC?
 
 # Thanks to
 
