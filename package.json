@@ -19,7 +19,7 @@
     "openvmsys"
   ],
   "author": "Guo Tingjin",
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "GPL-v3",
   "bugs": {
     "url": "https://github.com/OpenVMSys/openscope-project/issues"
   },

@@ -1,6 +1,6 @@
 import { AsrData, EseData, PrfData, SctData } from "../lib/sectortype";
 import elementId from "../lib/elementId";
-import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath } from "./sectorloader";
+import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw } from "./sectorloader";
 import { VoiceData, SymbologyData, ProfileData } from "../lib/settingtype";
 import { LoadSymbologySync, LoadVoiceSync, LoadProfileSync } from "./settingloader";
 import { parse2CoordB } from "../lib/coordparser";
@@ -177,6 +177,60 @@ export class Drawer {
                     this.canvasContext.stroke(line);
                 });
             }
+            if(item.type == "High airways")
+            {
+                const aw = ReadSctLoHiAw(this.sectorCache.hiAirways, item.name);
+                if(aw == undefined) return;
+                aw.coords.forEach(coord => {
+                    const coordA = parse2CoordB(coord.coordA);
+                    const coordB = parse2CoordB(coord.coordB);
+                    if(coordA == undefined || coordB == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
+                    const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
+                    if(symbol == undefined) return;
+                    const line = new Path2D();
+                    line.moveTo(coordA.longtitude * this.canvasIndex, coordA.latitude * this.canvasIndex);
+                    line.lineTo(coordB.longtitude * this.canvasIndex, coordB.latitude * this.canvasIndex);
+                    if(item.flag == "name")
+                    {
+                        this.canvasContext.fillStyle = symbol.color;
+                        this.canvasContext.font = symbol.fontSymbolSize + "px Arial";
+                        this.canvasContext.fillText(aw.group, (coordA.longtitude * this.canvasIndex + coordB.longtitude * this.canvasIndex) / 2, (coordA.latitude * this.canvasIndex + coordB.latitude * this.canvasIndex) / 2)
+                    }
+                    else
+                    {
+                        this.canvasContext.lineWidth = 0.5;
+                        this.canvasContext.strokeStyle = symbol.color;
+                        this.canvasContext.stroke(line);
+                    }
+                });
+            }
+            if(item.type == "Low airways")
+            {
+                const aw = ReadSctLoHiAw(this.sectorCache.hiAirways, item.name);
+                if(aw == undefined) return;
+                aw.coords.forEach(coord => {
+                    const coordA = parse2CoordB(coord.coordA);
+                    const coordB = parse2CoordB(coord.coordB);
+                    if(coordA == undefined || coordB == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
+                    const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
+                    if(symbol == undefined) return;
+                    const line = new Path2D();
+                    line.moveTo(coordA.longtitude * this.canvasIndex, coordA.latitude * this.canvasIndex);
+                    line.lineTo(coordB.longtitude * this.canvasIndex, coordB.latitude * this.canvasIndex);
+                    if(item.flag == "name")
+                    {
+                        this.canvasContext.fillStyle = symbol.color;
+                        this.canvasContext.font = symbol.fontSymbolSize + "px Arial";
+                        this.canvasContext.fillText(aw.group, (coordA.longtitude * this.canvasIndex + coordB.longtitude * this.canvasIndex) / 2, (coordA.latitude * this.canvasIndex + coordB.latitude * this.canvasIndex) / 2)
+                    }
+                    else
+                    {
+                        this.canvasContext.lineWidth = 0.5;
+                        this.canvasContext.strokeStyle = symbol.color;
+                        this.canvasContext.stroke(line);
+                    }
+                });
+            }
             if(item.type == "Regions")
             {
                 const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);
@@ -206,10 +260,7 @@ export class Drawer {
                     // this.canvasContext.stroke(line);
                 });
             }
-            if(item.type == "High airways")
-            {
-                
-            }
+            
         });
     }
 }

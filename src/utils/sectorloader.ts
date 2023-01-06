@@ -1,6 +1,6 @@
 import fs from "fs";
 import * as jschardet from "iconv-jschardet";
-import { Coordinate_A, EseFreetext, SctDefinition, SctFix, SctGEO, SctREGIONS, SymbologyDefine } from "../lib/datatype";
+import { Coordinate_A, EseFreetext, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SymbologyDefine } from "../lib/datatype";
 import * as sectortype from "../lib/sectortype";
 import spaceformatter from "../lib/spaceformatter";
 
@@ -1842,6 +1842,17 @@ export function ReadSctRegions(data: SctREGIONS[], group: string)
         if(region.group == group)
         {
             return region;
+        }
+    }
+}
+
+export function ReadSctLoHiAw(data: SctLoHiAirway[], group: string)
+{
+    for (let index = 0; index < data.length; index++) {
+        const runway = data[index];
+        if(runway.group == group)
+        {
+            return runway;
         }
     }
 }
