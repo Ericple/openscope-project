@@ -1,6 +1,6 @@
 import { AsrData, EseData, PrfData, SctData } from "../lib/sectortype";
 import elementId from "../lib/elementId";
-import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw, ReadSctAirport, ReadSctVORNDB, ReadSctARTCC, ReadSctSidStar } from "./sectorloader";
+import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw, ReadSctAirport, ReadSctVORNDB, ReadSctARTCC, ReadSctSidStar, ReadSctRunway } from "./sectorloader";
 import { VoiceData, SymbologyData, ProfileData } from "../lib/settingtype";
 import { LoadSymbologySync, LoadVoiceSync, LoadProfileSync } from "./settingloader";
 import { parse2CoordB } from "../lib/coordparser";
@@ -76,12 +76,13 @@ export class Drawer {
     }
     public UpdateCanvasPosXY(x: number, y: number) : void
     {
-        const xresult = this.canvasPosX + (x/20)/this.canvasIndex;
-        const yresult = this.canvasPosY + (y/20)/this.canvasIndex;
+        const xresult = this.canvasPosX + (x)/this.canvasIndex;
+        const yresult = this.canvasPosY + (y)/this.canvasIndex;
         this.canvasPosX = xresult;
         this.canvasPosY = yresult;
         if(this.coordIndicator == null) return;
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX} Index: ${this.canvasIndex}`;
+        this.ClearCanvas();
     }
     /**
      * 更新绘制缓存
@@ -182,19 +183,17 @@ export class Drawer {
                 // console.log(aw)
                 if(aw == undefined) return;
                 aw.coords.forEach(coord => {
-                    const coordA = parse2CoordB(coord.coordA);
-                    const coordB = parse2CoordB(coord.coordB);
-                    if(coordA == undefined || coordB == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
+                    if(coord == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
                     const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
                     if(symbol == undefined) return;
                     const line = new Path2D();
-                    line.moveTo(coordA.longtitude * this.canvasIndex, coordA.latitude * this.canvasIndex);
-                    line.lineTo(coordB.longtitude * this.canvasIndex, coordB.latitude * this.canvasIndex);
+                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
+                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
                     if(item.flag == "name")
                     {
                         this.canvasContext.fillStyle = symbol.color;
                         this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                        this.canvasContext.fillText(aw.group, (coordA.longtitude * this.canvasIndex + coordB.longtitude * this.canvasIndex) / 2, (coordA.latitude * this.canvasIndex + coordB.latitude * this.canvasIndex) / 2)
+                        this.canvasContext.fillText(aw.group, (coord.coordA.longtitude * this.canvasIndex + coord.coordB.longtitude * this.canvasIndex) / 2, (coord.coordA.latitude * this.canvasIndex + coord.coordB.latitude * this.canvasIndex) / 2)
                     }
                     else
                     {
@@ -210,21 +209,19 @@ export class Drawer {
                 // console.log(aw);
                 if(aw == undefined) return;
                 aw.coords.forEach(coord => {
-                    const coordA = parse2CoordB(coord.coordA);
-                    const coordB = parse2CoordB(coord.coordB);
                     // console.log("trying to draw loaw...",coordA.latitude,coordA.longtitude,coordB.latitude,coordB.longtitude)
-                    if(coordA == undefined || coordB == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
+                    if(coord == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
                     const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
                     console.log(symbol);
                     if(symbol == undefined) return;
                     const line = new Path2D();
-                    line.moveTo(coordA.longtitude * this.canvasIndex, coordA.latitude * this.canvasIndex);
-                    line.lineTo(coordB.longtitude * this.canvasIndex, coordB.latitude * this.canvasIndex);
+                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
+                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
                     if(item.flag == "name")
                     {
                         this.canvasContext.fillStyle = symbol.color;
                         this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                        this.canvasContext.fillText(aw.group, (coordA.longtitude * this.canvasIndex + coordB.longtitude * this.canvasIndex) / 2, (coordA.latitude * this.canvasIndex + coordB.latitude * this.canvasIndex) / 2)
+                        this.canvasContext.fillText(aw.group, (coord.coordA.longtitude * this.canvasIndex + coord.coordB.longtitude * this.canvasIndex) / 2, (coord.coordA.latitude * this.canvasIndex + coord.coordB.latitude * this.canvasIndex) / 2)
                     }
                     else
                     {
@@ -269,16 +266,30 @@ export class Drawer {
                     this.canvasContext.strokeStyle = color;
                     this.canvasContext.fillStyle = color;
                     this.canvasContext.stroke();
-                    this.canvasContext.fill('nonzero');
-                    // console.log("normally drawed",region.colorFlag);
-                    // this.canvasContext.strokeStyle = color;
-                    // this.canvasContext.stroke(line);
+                    this.canvasContext.fill();
                 });
             }
-            // if(item.type == "Runways")
-            // {
-            //     console.log("draw runway here");
-            // }
+            if(item.type == "Runways")
+            {
+                const nameItems = item.name.split(" ");
+                const runway = ReadSctRunway(this.sectorCache.runways, nameItems[0], nameItems[2]);
+                const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
+                if(runway == undefined || symbol == undefined) return;
+                this.canvasContext.strokeStyle = symbol.color;
+                this.canvasContext.font = symbol.fontSymbolSize * 2.3 + "px Arial";
+                if(item.flag == "name")
+                {
+                    this.canvasContext.fillText(runway.endPointA, runway.coordA.longtitude * this.canvasIndex, runway.coordA.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(runway.endPointB, runway.coordB.longtitude * this.canvasIndex, runway.coordB.latitude * this.canvasIndex);
+                }
+                else
+                {
+                    const line = new Path2D();
+                    line.moveTo(runway.coordA.longtitude * this.canvasIndex, runway.coordA.latitude * this.canvasIndex);
+                    line.lineTo(runway.coordB.longtitude * this.canvasIndex, runway.coordB.latitude * this.canvasIndex);
+                    this.canvasContext.stroke(line);
+                }
+            }
             if(item.type == "NDBs" || item.type == "VORs")
             {
                 let vorndb: SctVorNdb | undefined;
@@ -343,7 +354,7 @@ export class Drawer {
                 if(sidstar == undefined || symbol == undefined) return;
                 this.canvasContext.lineWidth = symbol.lineWeight;
                 this.canvasContext.strokeStyle = symbol.color;
-                this.canvasContext.setLineDash([1, 5]);
+                this.canvasContext.setLineDash([5, 5]);
                 sidstar.coords.forEach((coordpair) => {
                     const line = new Path2D();
                     line.moveTo(coordpair.coordA.longtitude * this.canvasIndex, coordpair.coordA.latitude * this.canvasIndex);

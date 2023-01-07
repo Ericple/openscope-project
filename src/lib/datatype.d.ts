@@ -95,8 +95,8 @@ export type SctRunway = {
     endPointB: string,
     HeadingA: number,
     HeadingB: number,
-    coordA: Coordinate_A,
-    coordB: Coordinate_A,
+    coordA: Coordinate_B,
+    coordB: Coordinate_B,
     airportCode: string,
     airportName: string,
     
@@ -130,8 +130,8 @@ export type SctSIDSTAR = {
 export type SctLoHiAirway = {
     group: string,
     coords: {
-        coordA: Coordinate_A,
-        coordB: Coordinate_A,
+        coordA: Coordinate_B,
+        coordB: Coordinate_B,
     }[]
     
 }

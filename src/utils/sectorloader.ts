@@ -1,7 +1,7 @@
 import fs from "fs";
 import * as jschardet from "iconv-jschardet";
 import { parse2CoordB } from "../lib/coordparser";
-import { Coordinate_A, EseFreetext, SctAirport, SctARTCC, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SctSIDSTAR, SctVorNdb, SymbologyDefine } from "../lib/datatype";
+import { Coordinate_A, EseFreetext, SctAirport, SctARTCC, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SctRunway, SctSIDSTAR, SctVorNdb, SymbologyDefine } from "../lib/datatype";
 import * as sectortype from "../lib/sectortype";
 import spaceformatter from "../lib/spaceformatter";
 
@@ -322,14 +322,14 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         endPointB: dataline[1],
                         HeadingA: parseInt(dataline[2]),
                         HeadingB: parseInt(dataline[3]),
-                        coordA: {
+                        coordA: parse2CoordB({
                             latitude: dataline[4],
                             longitude: dataline[5]
-                        },
-                        coordB: {
+                        }),
+                        coordB: parse2CoordB({
                             latitude: dataline[6],
                             longitude: dataline[7]
-                        },
+                        }),
                         airportCode: dataline[8],
                         airportName: dataline[9],
                         
@@ -601,14 +601,14 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         result.loAirways.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: {
+                                coordA: parse2CoordB({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
-                                },
-                                coordB: {
+                                }),
+                                coordB: parse2CoordB({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
-                                },
+                                }),
                             }]
                         });
                     }
@@ -617,14 +617,14 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         if(dataline[0] == result.loAirways[result.loAirways.length - 1].group)
                         {
                             result.loAirways[result.loAirways.length - 1].coords.push({
-                                coordA: {
+                                coordA: parse2CoordB({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
-                                },
-                                coordB: {
+                                }),
+                                coordB: parse2CoordB({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
-                                },
+                                }),
                             })
                         }
                     }
@@ -655,14 +655,14 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     result.hiAirways.push({
                         group: dataline[0],
                         coords: [{
-                            coordA: {
+                            coordA: parse2CoordB({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
-                            },
-                            coordB: {
+                            }),
+                            coordB: parse2CoordB({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
-                            },
+                            }),
                         }]
                     });
                 }
@@ -671,14 +671,14 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     if(dataline[0] == result.hiAirways[result.hiAirways.length - 1].group)
                     {
                         result.hiAirways[result.hiAirways.length - 1].coords.push({
-                            coordA: {
+                            coordA: parse2CoordB({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
-                            },
-                            coordB: {
+                            }),
+                            coordB: parse2CoordB({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
-                            },
+                            }),
                         })
                     }
                 }
@@ -940,14 +940,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                     endPointB: dataline[1],
                     HeadingA: parseInt(dataline[2]),
                     HeadingB: parseInt(dataline[3]),
-                    coordA: {
+                    coordA: parse2CoordB({
                         latitude: dataline[4],
                         longitude: dataline[5]
-                    },
-                    coordB: {
+                    }),
+                    coordB: parse2CoordB({
                         latitude: dataline[6],
                         longitude: dataline[7]
-                    },
+                    }),
                     airportCode: dataline[8],
                     airportName: dataline[9],
                     
@@ -1195,14 +1195,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                     result.loAirways.push({
                         group: dataline[0],
                         coords: [{
-                            coordA: {
+                            coordA: parse2CoordB({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
-                            },
-                            coordB: {
+                            }),
+                            coordB: parse2CoordB({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
-                            },
+                            }),
                         }]
                     });
                 }
@@ -1211,14 +1211,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                     if(dataline[0] == result.loAirways[result.loAirways.length - 1].group)
                     {
                         result.loAirways[result.loAirways.length - 1].coords.push({
-                            coordA: {
+                            coordA: parse2CoordB({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
-                            },
-                            coordB: {
+                            }),
+                            coordB: parse2CoordB({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
-                            },
+                            }),
                         })
                     }
                     else
@@ -1226,14 +1226,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                         result.loAirways.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: {
+                                coordA: parse2CoordB({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
-                                },
-                                coordB: {
+                                }),
+                                coordB: parse2CoordB({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
-                                },
+                                }),
                             }]
                         });
                     }
@@ -1265,14 +1265,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                     result.hiAirways.push({
                         group: dataline[0],
                         coords: [{
-                            coordA: {
+                            coordA: parse2CoordB({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
-                            },
-                            coordB: {
+                            }),
+                            coordB: parse2CoordB({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
-                            },
+                            }),
                         }]
                     });
                 }
@@ -1281,14 +1281,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                     if(dataline[0] == result.hiAirways[result.hiAirways.length - 1].group)
                     {
                         result.hiAirways[result.hiAirways.length - 1].coords.push({
-                            coordA: {
+                            coordA: parse2CoordB({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
-                            },
-                            coordB: {
+                            }),
+                            coordB: parse2CoordB({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
-                            },
+                            }),
                         })
                     }
                     else
@@ -1296,14 +1296,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                         result.hiAirways.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: {
+                                coordA: parse2CoordB({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
-                                },
-                                coordB: {
+                                }),
+                                coordB: parse2CoordB({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
-                                },
+                                }),
                             }]
                         });
                     }
@@ -1895,6 +1895,14 @@ export function ReadSctSidStar(data: SctSIDSTAR[], group: string)
     for (let index = 0; index < data.length; index++) {
         const sidstar = data[index];
         if(sidstar.group == group) return sidstar;
+    }
+}
+
+export function ReadSctRunway(data: SctRunway[], icao: string, idents: string)
+{
+    for (let index = 0; index < data.length; index++) {
+        const runway = data[index];
+        if(runway.airportCode == icao && `${runway.endPointA}-${runway.endPointB}` == idents) return runway;
     }
 }
 

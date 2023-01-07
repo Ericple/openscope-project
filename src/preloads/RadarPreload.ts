@@ -18,11 +18,12 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     canvasScreen.addEventListener('wheel', (e) => {
         drawer.UpdateCanvasIndex(e);
     });
-    canvasScreen.oncontextmenu = function(e) {
-        const prex = e.offsetX;
-        const prey = e.offsetY;
-        canvasScreen.onmousemove = function(ev) {
-            drawer.UpdateCanvasPosXY(ev.pageX - prex, ev.pageY - prey);
+    canvasScreen.oncontextmenu = function() {
+        // const prex = e.offsetX;
+        // const prey = e.offsetY;
+        canvasScreen.onmousemove = function(e) {
+            // drawer.UpdateCanvasPosXY(ev.pageX - prex, ev.pageY - prey);
+            drawer.UpdateCanvasPosXY(e.movementX, e.movementY);
         }
     };
     canvasScreen.onmouseup = function() {
