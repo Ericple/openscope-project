@@ -47,7 +47,6 @@ export class Drawer {
             //更新默认开启扇区
             fs.writeFile(DefaultSectorSettingFilePath, args.path, 'utf-8', (err) => {
                 if (err) throw err;
-                console.log("default sector changed");
             });
             //更新绘制缓存
             this.UpdateCache(args.path);
@@ -67,7 +66,7 @@ export class Drawer {
         this.canvasPosY = yresult;
         if (event.deltaY < 0) {
             const result = this.canvasIndex * 1.1;
-            if (result < 30000) this.canvasIndex = result;
+            if (result < 300000) this.canvasIndex = result;
         }
         else {
             const result = this.canvasIndex / 1.1;
@@ -228,36 +227,35 @@ export class Drawer {
             if (item.type == "Regions") {
                 /**
                  * 这个if内的代码有问题，不知道为什么就是绘制不出来……
-                 * 有没有大佬能够排故？非常感谢
-                 * 我已经在这熬了快六个小时了……
                  * 目前可以公开的情报：
                  * 1. 已知所有变量都不为空，不是这个问题
                  * 2. 没有2了。
                  */
-                const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);
-                if (regions == undefined) return;
-                regions.items.forEach((region) => {
+                const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);//从缓存中提取出对应regions区域
+                if (regions == undefined) return;//如果缓存中不存在该区域，则返回，进行下一次操作
+                regions.items.forEach((region) => {//对每个提取出来的区域进行绘制
                     if (this.sectorCache == undefined || this.canvasContext == undefined) return;
-                    const color = ReadSctDefine(this.sectorCache.definitions, region.colorFlag);
-                    if (color == undefined) return;
-                    this.canvasContext.beginPath();
-                    const coord0 = region.coords[0];
-                    const count = region.coords.length;
-                    // const line = new Path2D();
-                    // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
-                    this.canvasContext.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
-                    for (let index = 0; index < count; index++) {
+                    const color = ReadSctDefine(this.sectorCache.definitions, region.colorFlag);//从缓存中提取出对应的颜色，region的颜色被定义在sct中
+                    if (color == undefined) return;//如果sct中不存在对应的颜色flag定义，说明扇区有问题或读取失败
+                    this.canvasContext.beginPath();//开始绘制
+                    const coord0 = region.coords[0];//设置初始坐标
+                    const count = region.coords.length;//获取坐标总数，为for循环做好准备
+                    const line = new Path2D();//新建一个二维路径
+                    line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
+                    // this.canvasContext.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
+                    for (let index = 1; index < count; index++) {//循环绘制下一个坐标
                         const coord = region.coords[index];
-                        // line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
-                        this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                        line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                        // this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                     }
-                    // line.closePath();
-                    this.canvasContext.closePath();
+                    line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
+                    line.closePath();//闭合路径
+                    // this.canvasContext.closePath();
                     this.canvasContext.lineWidth = 0.1;
                     this.canvasContext.strokeStyle = color;
                     this.canvasContext.fillStyle = color;
-                    this.canvasContext.stroke();
-                    this.canvasContext.fill();
+                    this.canvasContext.stroke(line);
+                    this.canvasContext.fill(line);
                 });
             }
             if (item.type == "Runways") {

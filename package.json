@@ -29,7 +29,9 @@
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "@typescript-eslint/parser": "^5.48.0",
     "eslint": "^8.31.0",
-    "shelljs": "^0.8.5"
+    "shelljs": "^0.8.5",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "dependencies": {
     "electron": "^19.1.9",

@@ -9,7 +9,9 @@ export const ipcChannel = {
             minimize: "app.window.minimize"
         },
         update: {
-            prfFile: "app.update.prfFile"
+            prfFile: "app.update.prfFile",
+            theme: "app.toggle.theme",
+            themeSystem: "app.toggle.theme.system"
         },
         msg: {
             error: "app.errmsg",

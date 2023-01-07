@@ -6,7 +6,10 @@ import ipcChannel from "./lib/ipcChannel";
 import { DefaultSectorSettingFilePath, RadarWindowFilePath } from "./global";
 let RadarWindow: Electron.BrowserWindow;
 
+Electron.Menu.setApplicationMenu(null);
+
 function CreateRadarWindow() {
+
     RadarWindow = new Electron.BrowserWindow({
         minWidth: 1300,//最小宽度1300
         minHeight: 1000,//最小高度1000
@@ -111,4 +114,18 @@ Electron.ipcMain.handle(ipcChannel.app.func.connectToNetwork, () => {
 
 Electron.ipcMain.handle(ipcChannel.app.update.prfFile, () => {
     SelectSector();
+});
+
+Electron.ipcMain.handle(ipcChannel.app.update.theme, () => {
+    if (Electron.nativeTheme.shouldUseDarkColors) {
+        Electron.nativeTheme.themeSource = 'light';
+    } else {
+        Electron.nativeTheme.themeSource = 'dark';
+    }
+    return Electron.nativeTheme.shouldUseDarkColors;
+});
+
+Electron.ipcMain.handle(ipcChannel.app.update.themeSystem, () => {
+    Electron.nativeTheme.themeSource = 'system';
+    return Electron.nativeTheme.shouldUseDarkColors;
 })

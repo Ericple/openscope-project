@@ -11,6 +11,12 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     const minimizebtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.minimize);
     const canvasScreen = document.getElementById(elementId.RadarWindow.Canvas.screen);
     const sectorbtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.sectorSelect);
+    const themebtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.theme);
+    
+    ipcRenderer.invoke(ipcChannel.app.update.themeSystem);
+    themebtn?.addEventListener('click', () => {
+        ipcRenderer.invoke(ipcChannel.app.update.theme);
+    })
     if (canvasScreen == null) return;
     sectorbtn?.addEventListener('click', () => {
         ipcRenderer.invoke(ipcChannel.app.update.prfFile);

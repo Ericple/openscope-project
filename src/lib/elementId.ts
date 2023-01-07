@@ -11,7 +11,8 @@ export const elementId = {
                 setting: "button-setting",
                 close: "button-close-app",
                 maximizeOrRestore: "button-restore-app",
-                minimize: "button-minimize-app"
+                minimize: "button-minimize-app",
+                theme: "button-theme-toggle"
             },
             Tags: {
                 currentCI: "appbar-connection-info",
