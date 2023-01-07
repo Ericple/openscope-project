@@ -1227,43 +1227,49 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 if (line == "") return;
                 //读取
                 const dataline = line.split(" ");
-                if (dataline.length == 4 && result.REGIONs.length - 1 >= 0 && dataline[0] !== result.REGIONs[result.REGIONs.length - 1].group) {
-                    result.REGIONs.push({
-                        group: dataline[0],
-                        items: [{
-                            colorFlag: dataline[1],
-                            coords: [parse2CoordB({
-                                latitude: dataline[2], longitude: dataline[3]
-                            })]
-                        }],
-                    });
-                }
-                else if (dataline.length == 4 && result.REGIONs.length - 1 < 0) {
-                    result.REGIONs.push({
-                        group: dataline[0],
-                        items: [{
-                            colorFlag: dataline[1],
-                            coords: [parse2CoordB({
-                                latitude: dataline[2], longitude: dataline[3]
-                            })]
-                        }],
-                    });
-                }
-                else if (dataline.length == 4 && result.REGIONs.length - 1 >= 0 && dataline[0] == result.REGIONs[result.REGIONs.length - 1].group) {
-                    result.REGIONs[result.REGIONs.length - 1].items.push({
-                        colorFlag: dataline[1],
-                        coords: [parse2CoordB({
-                            latitude: dataline[2], longitude: dataline[3]
-                        })]
-                    });
-                }
-                else if (dataline.length == 2 && result.REGIONs.length - 1 > 0) {
-                    result.REGIONs[result.REGIONs.length - 1].items.push({
-                        colorFlag: result.REGIONs[result.REGIONs.length - 1].items[result.REGIONs[result.REGIONs.length - 1].items.length - 1].colorFlag,
-                        coords: [parse2CoordB({
-                            latitude: dataline[0], longitude: dataline[1]
-                        })]
-                    });
+                //四行则新建item
+                if(dataline.length == 4){
+                    //为空则直接插入
+                    if(result.REGIONs.length == 0){
+                        result.REGIONs.push({
+                            group: dataline[0],
+                            items: [{
+                                colorFlag: dataline[1],
+                                coords: [parse2CoordB({
+                                    latitude: dataline[2], longitude: dataline[3]
+                                })]
+                            }],
+                        });
+                    }else{//不为空先判断和最后加入的是否为同一组
+                        //是则插入到最后一项中的items里
+                        if(dataline[0] == result.REGIONs[result.REGIONs.length - 1].group){
+                            result.REGIONs[result.REGIONs.length - 1].items.push({
+                                colorFlag: dataline[1],
+                                coords: [parse2CoordB({
+                                    latitude: dataline[2], longitude: dataline[3]
+                                })]
+                            });
+                        }else{
+                            //否则新建
+                            result.REGIONs.push({
+                                group: dataline[0],
+                                items: [{
+                                    colorFlag: dataline[1],
+                                    coords: [parse2CoordB({
+                                        latitude: dataline[2], longitude: dataline[3]
+                                    })]
+                                }],
+                            });
+                        }
+                    }
+                }else{
+                    //两行则直接插入最后一项的item的coords
+                    result.REGIONs[result.REGIONs.length - 1].items[result.REGIONs[result.REGIONs.length - 1].items.length - 1].coords.push(parse2CoordB(
+                        {
+                            latitude: dataline[0],
+                            longitude: dataline[1]
+                        }
+                    ))
                 }
             }
         });

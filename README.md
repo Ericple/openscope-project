@@ -31,3 +31,19 @@ All contributions are welcomed. Before forking this repository, please consider 
 
 
 - ***Wenlue Zhang*** for pointing out the sucked code for UTC Time Display interval function.
+
+# FAQ
+
+- The freetexts are covered by the airport polygon, what should I do?
+  - Please refers to the .asr file your sector loads, open it with the text editor you like, find those lines prefixed with "Regions:", cut all these lines and paste it under "SECTORTITLE:", like the example below：
+  ```
+    DisplayTypeName:Standard ES radar screen
+    DisplayTypeNeedRadarContent:1
+    DisplayTypeGeoReferenced:1
+    SECTORFILE:
+    SECTORTITLE:
+    ;The Regions should be right under the "SECTORTITLE:" line
+    Regions:ZSSS:polygon
+    Regions:ZSPD:polygon
+    ......
+  ```

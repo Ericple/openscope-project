@@ -146,16 +146,6 @@ export class Drawer {
                     this.canvasContext.fillRect(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size);
                 }
             }
-            if (item.type == "Free Text")//绘制freetext
-            {
-                const groupandtext = item.name.split("\\");
-                const origincoord = ReadEseFreeText(this.eseCache.freetexts, groupandtext[0], groupandtext[1]);
-                const symbol = ReadSymbol(this.symbolCache.colors, "Other", item.flag);
-                if (origincoord == undefined) return;
-                if (symbol == undefined) return;
-                this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                this.canvasContext.fillText(groupandtext[1], origincoord.longtitude * this.canvasIndex, origincoord.latitude * this.canvasIndex);
-            }
             if (item.type == "Geo")//绘制地面线
             {
                 const geogroup = ReadSctGeo(this.sectorCache.GEOs, item.name);
@@ -225,37 +215,33 @@ export class Drawer {
                 });
             }
             if (item.type == "Regions") {
-                /**
-                 * 这个if内的代码有问题，不知道为什么就是绘制不出来……
-                 * 目前可以公开的情报：
-                 * 1. 已知所有变量都不为空，不是这个问题
-                 * 2. 没有2了。
-                 */
                 const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);//从缓存中提取出对应regions区域
+                // console.log("got regions of",regions?.items.length,"nodes")
                 if (regions == undefined) return;//如果缓存中不存在该区域，则返回，进行下一次操作
-                regions.items.forEach((region) => {//对每个提取出来的区域进行绘制
+                regions.items.forEach((item) => {//对每个提取出来的区域进行绘制
+                    // console.log("Drawing region from",item.coords.length,"nodes");
                     if (this.sectorCache == undefined || this.canvasContext == undefined) return;
-                    const color = ReadSctDefine(this.sectorCache.definitions, region.colorFlag);//从缓存中提取出对应的颜色，region的颜色被定义在sct中
-                    if (color == undefined) return;//如果sct中不存在对应的颜色flag定义，说明扇区有问题或读取失败
                     this.canvasContext.beginPath();//开始绘制
-                    const coord0 = region.coords[0];//设置初始坐标
-                    const count = region.coords.length;//获取坐标总数，为for循环做好准备
-                    const line = new Path2D();//新建一个二维路径
-                    line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
-                    // this.canvasContext.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
-                    for (let index = 1; index < count; index++) {//循环绘制下一个坐标
-                        const coord = region.coords[index];
-                        line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
-                        // this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
-                    }
-                    line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
-                    line.closePath();//闭合路径
-                    // this.canvasContext.closePath();
+                    const color = ReadSctDefine(this.sectorCache.definitions, item.colorFlag);//从缓存中提取出对应的颜色，region的颜色被定义在sct中
+                    if (color == undefined) return;//如果sct中不存在对应的颜色flag定义，说明扇区有问题或读取失败
                     this.canvasContext.lineWidth = 0.1;
                     this.canvasContext.strokeStyle = color;
                     this.canvasContext.fillStyle = color;
-                    this.canvasContext.stroke(line);
-                    this.canvasContext.fill(line);
+                    const count = item.coords.length;//获取坐标总数，为for循环做好准备
+                    // const line = new Path2D();//新建一个二维路径
+                    // line.moveTo(region.coords[0].longtitude * this.canvasIndex, region.coords[0].latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
+                    this.canvasContext.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);
+                    for (let index = 1; index < count; index++) {//循环绘制下一个坐标
+                        const coord = item.coords[index];
+                        // console.log("drawing",coord.longtitude, coord.latitude);
+                        // line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                        this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                    }
+                    // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
+                    // line.closePath();//闭合路径
+                    this.canvasContext.closePath();
+                    this.canvasContext.stroke();
+                    this.canvasContext.fill();
                 });
             }
             if (item.type == "Runways") {
@@ -308,6 +294,16 @@ export class Drawer {
                 else {
                     this.canvasContext.fillRect(airport.coord.longtitude * this.canvasIndex, airport.coord.latitude * this.canvasIndex, size, size);
                 }
+            }
+            if (item.type == "Free Text")//绘制freetext
+            {
+                const groupandtext = item.name.split("\\");
+                const origincoord = ReadEseFreeText(this.eseCache.freetexts, groupandtext[0], groupandtext[1]);
+                const symbol = ReadSymbol(this.symbolCache.colors, "Other", item.flag);
+                if (origincoord == undefined) return;
+                if (symbol == undefined) return;
+                this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
+                this.canvasContext.fillText(groupandtext[1], origincoord.longtitude * this.canvasIndex, origincoord.latitude * this.canvasIndex);
             }
             if (item.type == "ARTCC boundary") {
                 const artcc = ReadSctARTCC(this.sectorCache.ARTCCs, item.name);
