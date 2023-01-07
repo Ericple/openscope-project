@@ -709,14 +709,14 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         result.GEOs.push({
                             group: dataline[0],
                             items: [{
-                                coordA: {
+                                coordA: parse2CoordB({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
-                                },
-                                coordB: {
+                                }),
+                                coordB: parse2CoordB({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
-                                },
+                                }),
                                 colorFlag: dataline[5],
                             }]
                         });
@@ -724,14 +724,16 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     else
                     {
                         result.GEOs[result.GEOs.length-1].items.push({
-                            coordA: {
-                                latitude: dataline[0],
-                                longitude: dataline[1]
-                            },
-                            coordB: {
+                            coordA: parse2CoordB(
+                                {
+                                    latitude: dataline[0],
+                                    longitude: dataline[1]
+                                }
+                            ),
+                            coordB: parse2CoordB({
                                 latitude: dataline[2],
                                 longitude: dataline[3]
-                            },
+                            }),
                             colorFlag:dataline[4]
                         });
                     }
@@ -763,9 +765,9 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                             group: dataline[0],
                             items: [{
                                 colorFlag: dataline[1],
-                                coords: [{
+                                coords: [parse2CoordB({
                                     latitude:dataline[2], longitude:dataline[3]
-                                }]
+                                })]
                             }],
                         });
                     }
@@ -773,9 +775,9 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     {
                         result.REGIONs[result.REGIONs.length-1].items.push({
                             colorFlag: result.REGIONs[result.REGIONs.length-1].items[result.REGIONs[result.REGIONs.length-1].items.length - 1].colorFlag,
-                            coords: [{
+                            coords: [parse2CoordB({
                                 latitude:dataline[0], longitude:dataline[1]
-                            }]
+                            })]
                         });
                     }
                 }
@@ -1335,14 +1337,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                     result.GEOs.push({
                         group: dataline[0],
                         items: [{
-                            coordA: {
+                            coordA: parse2CoordB({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
-                            },
-                            coordB: {
+                            }),
+                            coordB: parse2CoordB({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
-                            },
+                            }),
                             colorFlag: dataline[5],
                         }]
                     });
@@ -1350,14 +1352,14 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                 else
                 {
                     result.GEOs[result.GEOs.length-1].items.push({
-                        coordA: {
+                        coordA: parse2CoordB({
                             latitude: dataline[0],
                             longitude: dataline[1]
-                        },
-                        coordB: {
+                        }),
+                        coordB: parse2CoordB({
                             latitude: dataline[2],
                             longitude: dataline[3]
-                        },
+                        }),
                         colorFlag:dataline[4]
                     });
                 }
@@ -1389,9 +1391,9 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                         group: dataline[0],
                         items: [{
                             colorFlag: dataline[1],
-                            coords: [{
+                            coords: [parse2CoordB({
                                 latitude:dataline[2], longitude:dataline[3]
-                            }]
+                            })]
                         }],
                     });
                 }
@@ -1401,9 +1403,9 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                         group: dataline[0],
                         items: [{
                             colorFlag: dataline[1],
-                            coords: [{
+                            coords: [parse2CoordB({
                                 latitude:dataline[2], longitude:dataline[3]
-                            }]
+                            })]
                         }],
                     });
                 }
@@ -1411,18 +1413,18 @@ export function LoadSctFileSync(path: string) : sectortype.SctData
                 {
                     result.REGIONs[result.REGIONs.length-1].items.push({
                         colorFlag: dataline[1],
-                        coords: [{
+                        coords: [parse2CoordB({
                             latitude:dataline[2], longitude:dataline[3]
-                        }]
+                        })]
                     });
                 }
                 else if(dataline.length == 2 && result.REGIONs.length - 1 > 0)
                 {
                     result.REGIONs[result.REGIONs.length-1].items.push({
                         colorFlag: result.REGIONs[result.REGIONs.length-1].items[result.REGIONs[result.REGIONs.length-1].items.length - 1].colorFlag,
-                        coords: [{
+                        coords: [parse2CoordB({
                             latitude:dataline[0], longitude:dataline[1]
-                        }]
+                        })]
                     });
                 }
             }
@@ -1544,10 +1546,10 @@ export function LoadEseFile(path: string, callback: (err: NodeJS.ErrnoException 
                     //读取
                     const dataline = line.split(":");
                     result.freetexts.push({
-                        coord: {
+                        coord: parse2CoordB({
                             latitude: dataline[0],
                             longitude: dataline[1]
-                        },
+                        }),
                         group: dataline[2],
                         text: dataline[3],
                         
@@ -1733,10 +1735,10 @@ export function LoadEseFileSync(path: string) : sectortype.EseData
                 //读取
                 const dataline = line.split(":");
                 result.freetexts.push({
-                    coord: {
+                    coord: parse2CoordB({
                         latitude: dataline[0],
                         longitude: dataline[1]
-                    },
+                    }),
                     group: dataline[2],
                     text: dataline[3],
                     

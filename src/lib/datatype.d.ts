@@ -138,8 +138,8 @@ export type SctLoHiAirway = {
 export type SctGEO = {
     group: string,
     items: {
-        coordA: Coordinate_A,
-        coordB: Coordinate_A,
+        coordA: Coordinate_B,
+        coordB: Coordinate_B,
         colorFlag: string,
     }[],
 }
@@ -147,7 +147,7 @@ export type SctREGIONS = {
     group: string,
     items: {
         colorFlag: string,
-        coords: Coordinate_A[],
+        coords: Coordinate_B[],
     }[]
 }
 
@@ -176,7 +176,7 @@ export type EseAirspace = {
     } | null
 }
 export type EseFreetext = {
-    coord: Coordinate_A,
+    coord: Coordinate_B,
     group: string,
     text: string,
     

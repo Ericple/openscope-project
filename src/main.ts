@@ -3,8 +3,8 @@ import * as Electron from "electron";
 import path from "path";
 import fs from "fs";
 import ipcChannel from "./lib/ipcChannel";
-const DefaultSectorSettingFilePath = path.join(__dirname,"config","defaultsector.txt");
-const RadarWindowFilePath = path.join(__dirname,"pages","html","RadarWindow.html");
+import { DefaultSectorSettingFilePath, RadarWindowFilePath } from "./global";
+
 Electron.app.on('ready', () => {
     //设置程序名称
     Electron.app.setName("OpenScope");
@@ -103,7 +103,6 @@ Electron.app.on('ready', () => {
         }).then((result) => {
             if(result.canceled) return;
             RadarWindow.webContents.send(ipcChannel.app.update.prfFile,{ path: result.filePaths[0] });
-            fs.writeFileSync(DefaultSectorSettingFilePath,result.filePaths[0]);
         });
         
     }

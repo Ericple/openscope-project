@@ -65,10 +65,6 @@ export class Drawer {
     }
     public UpdateCanvasIndex(event: WheelEvent) : void
     {
-        const xresult = this.canvasPosX + (event.movementX)/this.canvasIndex;
-        const yresult = this.canvasPosY + (event.movementY)/this.canvasIndex;
-        this.canvasPosX = xresult;
-        this.canvasPosY = yresult;
         if(event.deltaY < 0)
         {
             const result = this.canvasIndex * 1.1;
@@ -83,15 +79,15 @@ export class Drawer {
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX} Index: ${this.canvasIndex}`;
         this.ClearCanvas(event);
     }
-    public UpdateCanvasPosXY(e: MouseEvent) : void
+    public UpdateCanvasPosXY(x: number, y: number) : void
     {
-        const xresult = this.canvasPosX + (e.movementX)/this.canvasIndex;
-        const yresult = this.canvasPosY + (e.movementY)/this.canvasIndex;
+        const xresult = this.canvasPosX + (x)/this.canvasIndex;
+        const yresult = this.canvasPosY + (y)/this.canvasIndex;
         this.canvasPosX = xresult;
         this.canvasPosY = yresult;
         if(this.coordIndicator == null) return;
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX} Index: ${this.canvasIndex}`;
-        this.ClearCanvas(e);
+        this.ClearCanvas();
     }
     /**
      * 更新绘制缓存
@@ -165,9 +161,10 @@ export class Drawer {
                 const origincoord = ReadEseFreeText(this.eseCache.freetexts, groupandtext[0], groupandtext[1]);
                 const symbol = ReadSymbol(this.symbolCache.colors, "Other", item.flag);
                 if(origincoord == undefined) return;
+                const coord = parse2CoordB(origincoord);
                 if(symbol == undefined) return;
                 this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                this.canvasContext.fillText(groupandtext[1], origincoord.longtitude * this.canvasIndex, origincoord.latitude * this.canvasIndex);
+                this.canvasContext.fillText(groupandtext[1], coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
             }
             if(item.type == "Geo")//绘制地面线
             {
@@ -179,9 +176,11 @@ export class Drawer {
                     if(this.sectorCache == undefined || this.canvasContext == undefined) return;
                     const colorDef = ReadSctDefine(this.sectorCache.definitions, geo.colorFlag);
                     if(colorDef == undefined) return;
+                    const coordA = parse2CoordB(geo.coordA);
+                    const coordB = parse2CoordB(geo.coordB);
                     const line = new Path2D();
-                    line.moveTo(geo.coordA.longtitude * this.canvasIndex, geo.coordA.latitude * this.canvasIndex);
-                    line.lineTo(geo.coordB.longtitude * this.canvasIndex, geo.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coordA.longtitude * this.canvasIndex, coordA.latitude * this.canvasIndex);
+                    line.lineTo(coordB.longtitude * this.canvasIndex, coordB.latitude * this.canvasIndex);
                     this.canvasContext.strokeStyle = colorDef;
                     this.canvasContext.stroke(line);
                 });
@@ -258,14 +257,14 @@ export class Drawer {
                     const color = ReadSctDefine(this.sectorCache.definitions, region.colorFlag);
                     if(color == undefined) return;
                     this.canvasContext.beginPath();
-                    const coord0 = region.coords[0];
+                    const coord0 = parse2CoordB(region.coords[0]);
                     const count = region.coords.length;
                     // const line = new Path2D();
                     // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
                     this.canvasContext.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
                     for(let index = 0; index < count; index++)
                     {
-                        const coord = region.coords[index];
+                        const coord = parse2CoordB(region.coords[index]);
                         // line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                         this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                     }

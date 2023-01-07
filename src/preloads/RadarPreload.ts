@@ -23,12 +23,11 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
         // const prey = e.offsetY;
         canvasScreen.onmousemove = function(e) {
             // drawer.UpdateCanvasPosXY(ev.pageX - prex, ev.pageY - prey);
-            drawer.UpdateCanvasPosXY(e.movementX, e.movementY);
+            drawer.UpdateCanvasPosXY(e);
         }
     };
     canvasScreen.onmouseup = function() {
         canvasScreen.onmousemove = null;
-        drawer.ClearCanvas();
     };
     closebtn?.addEventListener('click', () => {
         ipcRenderer.invoke(ipcChannel.app.window.close);

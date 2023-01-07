@@ -40,7 +40,7 @@ export class Drawer {
         this.canvasPosY = 0;
         //当页面大小被改变时，重新进行绘制
         window.addEventListener('resize', () => {
-            this.ClearCanvas();
+            this.RedrawCanvas();
         });
         //处理扇区选择
         ipcRenderer.on(ipcChannel.app.update.prfFile,(e, args) => {
@@ -54,10 +54,10 @@ export class Drawer {
             //更新绘制缓存
             this.UpdateCache(args.path);
             //绘制
-            this.ClearCanvas();
+            this.RedrawCanvas();
         });
     }
-    public ClearCanvas(e?: MouseEvent) : void
+    public RedrawCanvas(e?: MouseEvent) : void//redraw
     {
         this.canvas.height = window.innerHeight - 136;
         this.canvas.width = window.innerWidth;
@@ -65,23 +65,21 @@ export class Drawer {
     }
     public UpdateCanvasIndex(event: WheelEvent) : void
     {
-        const xresult = this.canvasPosX + (event.movementX)/this.canvasIndex;
-        const yresult = this.canvasPosY + (event.movementY)/this.canvasIndex;
-        this.canvasPosX = xresult;
-        this.canvasPosY = yresult;
-        if(event.deltaY < 0)
-        {
+        if(this.canvasContext == undefined) return;
+        if(event.deltaY < 0) {
+            console.log("向上滚动了滑轮")
             const result = this.canvasIndex * 1.1;
             if(result < 30000) this.canvasIndex = result;
         }
         else
         {
+            console.log("向下滚动了滑轮")
             const result = this.canvasIndex / 1.1;
             if(result > 1) this.canvasIndex = result;
         }
         if(this.coordIndicator == null) return;
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX} Index: ${this.canvasIndex}`;
-        this.ClearCanvas(event);
+        this.RedrawCanvas(event);
     }
     public UpdateCanvasPosXY(e: MouseEvent) : void
     {
@@ -91,7 +89,7 @@ export class Drawer {
         this.canvasPosY = yresult;
         if(this.coordIndicator == null) return;
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX} Index: ${this.canvasIndex}`;
-        this.ClearCanvas(e);
+        this.RedrawCanvas(e);
     }
     /**
      * 更新绘制缓存
@@ -125,14 +123,21 @@ export class Drawer {
         profilepath = path.join(prfPath, "..", AlignPath(profilepath));
         this.profileCache = LoadProfileSync(profilepath);
     }
-    public Draw(e?: MouseEvent) : void
+    public Draw(event?: MouseEvent) : void
     {
         if(this.canvasContext == undefined) return;
         this.canvasContext.translate(this.canvasPosX, this.canvasPosY);
-        this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
-        if(e !== undefined) {
-            this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
-            this.canvasContext.translate(e.offsetX, e.offsetY);
+        // this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
+        // if(e !== undefined) {
+        //     this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
+        //     this.canvasContext.translate(e.offsetX, e.offsetY);
+        // }
+        if(event !== undefined)
+        {
+            console.log("Zoom",this.canvasIndex);
+            this.canvasContext.translate(event.offsetX,event.offsetY);
+            this.canvasContext.scale(this.canvasIndex,this.canvasIndex);
+            this.canvasContext.translate(-event.offsetX,-event.offsetY);
         }
         if(this.asrCache == undefined) return;
         this.asrCache.items.forEach((item) => {
@@ -150,13 +155,13 @@ export class Drawer {
                 if(item.flag == "name")
                 {
                     this.canvasContext.font = symbol.fontSymbolSize * 2.5 + "px Arial";
-                    this.canvasContext.fillText(item.name, coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(item.name, coord.longtitude, coord.latitude);
                 }
                 else
                 {
                     //这里的代码后续需要实现DrawScript
                     const size = symbol.fontSymbolSize;
-                    this.canvasContext.fillRect(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size);
+                    this.canvasContext.fillRect(coord.longtitude, coord.latitude, size, size);
                 }
             }
             if(item.type == "Free Text")//绘制freetext
@@ -165,9 +170,10 @@ export class Drawer {
                 const origincoord = ReadEseFreeText(this.eseCache.freetexts, groupandtext[0], groupandtext[1]);
                 const symbol = ReadSymbol(this.symbolCache.colors, "Other", item.flag);
                 if(origincoord == undefined) return;
+                const coord = parse2CoordB(origincoord);
                 if(symbol == undefined) return;
                 this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                this.canvasContext.fillText(groupandtext[1], origincoord.longtitude * this.canvasIndex, origincoord.latitude * this.canvasIndex);
+                this.canvasContext.fillText(groupandtext[1], coord.longtitude, coord.latitude);
             }
             if(item.type == "Geo")//绘制地面线
             {
@@ -179,9 +185,11 @@ export class Drawer {
                     if(this.sectorCache == undefined || this.canvasContext == undefined) return;
                     const colorDef = ReadSctDefine(this.sectorCache.definitions, geo.colorFlag);
                     if(colorDef == undefined) return;
+                    const coordA = parse2CoordB(geo.coordA);
+                    const coordB = parse2CoordB(geo.coordB);
                     const line = new Path2D();
-                    line.moveTo(geo.coordA.longtitude * this.canvasIndex, geo.coordA.latitude * this.canvasIndex);
-                    line.lineTo(geo.coordB.longtitude * this.canvasIndex, geo.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coordA.longtitude, coordA.latitude);
+                    line.lineTo(coordB.longtitude, coordB.latitude);
                     this.canvasContext.strokeStyle = colorDef;
                     this.canvasContext.stroke(line);
                 });
@@ -196,13 +204,13 @@ export class Drawer {
                     const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
                     if(symbol == undefined) return;
                     const line = new Path2D();
-                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
-                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coord.coordA.longtitude, coord.coordA.latitude);
+                    line.lineTo(coord.coordB.longtitude, coord.coordB.latitude);
                     if(item.flag == "name")
                     {
                         this.canvasContext.fillStyle = symbol.color;
                         this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                        this.canvasContext.fillText(aw.group, (coord.coordA.longtitude * this.canvasIndex + coord.coordB.longtitude * this.canvasIndex) / 2, (coord.coordA.latitude * this.canvasIndex + coord.coordB.latitude * this.canvasIndex) / 2)
+                        this.canvasContext.fillText(aw.group, (coord.coordA.longtitude + coord.coordB.longtitude) / 2, (coord.coordA.latitude + coord.coordB.latitude) / 2)
                     }
                     else
                     {
@@ -224,13 +232,13 @@ export class Drawer {
                     console.log(symbol);
                     if(symbol == undefined) return;
                     const line = new Path2D();
-                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
-                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coord.coordA.longtitude, coord.coordA.latitude);
+                    line.lineTo(coord.coordB.longtitude, coord.coordB.latitude);
                     if(item.flag == "name")
                     {
                         this.canvasContext.fillStyle = symbol.color;
                         this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                        this.canvasContext.fillText(aw.group, (coord.coordA.longtitude * this.canvasIndex + coord.coordB.longtitude * this.canvasIndex) / 2, (coord.coordA.latitude * this.canvasIndex + coord.coordB.latitude * this.canvasIndex) / 2)
+                        this.canvasContext.fillText(aw.group, (coord.coordA.longtitude + coord.coordB.longtitude) / 2, (coord.coordA.latitude + coord.coordB.latitude) / 2)
                     }
                     else
                     {
@@ -258,16 +266,16 @@ export class Drawer {
                     const color = ReadSctDefine(this.sectorCache.definitions, region.colorFlag);
                     if(color == undefined) return;
                     this.canvasContext.beginPath();
-                    const coord0 = region.coords[0];
+                    const coord0 = parse2CoordB(region.coords[0]);
                     const count = region.coords.length;
                     // const line = new Path2D();
-                    // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
-                    this.canvasContext.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);
+                    // line.moveTo(coord0.longtitude, coord0.latitude);
+                    this.canvasContext.moveTo(coord0.longtitude, coord0.latitude);
                     for(let index = 0; index < count; index++)
                     {
-                        const coord = region.coords[index];
-                        // line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
-                        this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                        const coord = parse2CoordB(region.coords[index]);
+                        // line.lineTo(coord.longtitude, coord.latitude);
+                        this.canvasContext.lineTo(coord.longtitude, coord.latitude);
                     }
                     // line.closePath();
                     this.canvasContext.closePath();
@@ -288,14 +296,14 @@ export class Drawer {
                 this.canvasContext.font = symbol.fontSymbolSize * 2.3 + "px Arial";
                 if(item.flag == "name")
                 {
-                    this.canvasContext.fillText(runway.endPointA, runway.coordA.longtitude * this.canvasIndex, runway.coordA.latitude * this.canvasIndex);
-                    this.canvasContext.fillText(runway.endPointB, runway.coordB.longtitude * this.canvasIndex, runway.coordB.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(runway.endPointA, runway.coordA.longtitude, runway.coordA.latitude);
+                    this.canvasContext.fillText(runway.endPointB, runway.coordB.longtitude, runway.coordB.latitude);
                 }
                 else
                 {
                     const line = new Path2D();
-                    line.moveTo(runway.coordA.longtitude * this.canvasIndex, runway.coordA.latitude * this.canvasIndex);
-                    line.lineTo(runway.coordB.longtitude * this.canvasIndex, runway.coordB.latitude * this.canvasIndex);
+                    line.moveTo(runway.coordA.longtitude, runway.coordA.latitude);
+                    line.lineTo(runway.coordB.longtitude, runway.coordB.latitude);
                     this.canvasContext.stroke(line);
                 }
             }
@@ -313,12 +321,12 @@ export class Drawer {
                 this.canvasContext.font = size * 2.2 + "px Arial";
                 if(item.flag == "name")
                 {
-                    this.canvasContext.fillText(vorndb.name, coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(vorndb.name, coord.longtitude, coord.latitude);
                 }
                 else
                 {
                     //这里同样要实现绘制脚本
-                    this.canvasContext.fillRect(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size)
+                    this.canvasContext.fillRect(coord.longtitude, coord.latitude, size, size)
                 }
             }
             if(item.type == "Airports")
@@ -333,11 +341,11 @@ export class Drawer {
                 this.canvasContext.font = size * 2.2 + "px Arial";
                 if(item.flag == "name")
                 {
-                    this.canvasContext.fillText(airport.icao, coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(airport.icao, coord.longtitude, coord.latitude);
                 }
                 else
                 {
-                    this.canvasContext.fillRect(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size);
+                    this.canvasContext.fillRect(coord.longtitude, coord.latitude, size, size);
                 }
             }
             if(item.type == "ARTCC boundary")
@@ -349,8 +357,8 @@ export class Drawer {
                 this.canvasContext.strokeStyle = symbol.color;
                 artcc.coords.forEach((coord) => {
                     const line = new Path2D();
-                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
-                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coord.coordA.longtitude, coord.coordA.latitude);
+                    line.lineTo(coord.coordB.longtitude, coord.coordB.latitude);
                     this.canvasContext?.stroke(line);
                 });
             }
@@ -366,8 +374,8 @@ export class Drawer {
                 this.canvasContext.setLineDash([5, 5]);
                 sidstar.coords.forEach((coordpair) => {
                     const line = new Path2D();
-                    line.moveTo(coordpair.coordA.longtitude * this.canvasIndex, coordpair.coordA.latitude * this.canvasIndex);
-                    line.lineTo(coordpair.coordB.longtitude * this.canvasIndex, coordpair.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coordpair.coordA.longtitude, coordpair.coordA.latitude);
+                    line.lineTo(coordpair.coordB.longtitude, coordpair.coordB.latitude);
                     this.canvasContext?.stroke(line);
                 });
             }
