@@ -58,8 +58,8 @@ export type AsrDrawItem = {
  * asr文件中定义的默认显示区域，由左上角坐标及右下角坐标组成
  */
 export type AsrWindowArea = {
-    coord1: Coordinate_A,
-    coord2: Coordinate_A
+    coord1: Coordinate_B,
+    coord2: Coordinate_B
 }
 
 /**
@@ -81,14 +81,14 @@ export type SctInfo = {
 export type SctVorNdb = {
     name: string,
     frequency: string,
-    coord: Coordinate_A,
+    coord: Coordinate_B,
 }
 export type SctAirport = {
     icao: string,
     frequency: string,
-    coord: Coordinate_A,
+    coord: Coordinate_B,
     class: string,
-    
+
 }
 export type SctRunway = {
     endPointA: string,
@@ -99,12 +99,12 @@ export type SctRunway = {
     coordB: Coordinate_B,
     airportCode: string,
     airportName: string,
-    
+
 }
 export type SctFix = {
     name: string,
-    coord: Coordinate_A,
-    
+    coord: Coordinate_B,
+
 }
 export type SctARTCC = {
     group: string,
@@ -113,13 +113,6 @@ export type SctARTCC = {
         coordB: Coordinate_B,
     }[]
 }
-// export type SctARTCC = {
-//     group: string,
-//     coords: {
-//         coordA: Coordinate_A,
-//         coordB: Coordinate_A,
-//     }[]
-// }
 export type SctSIDSTAR = {
     group: string,
     coords: {
@@ -133,7 +126,7 @@ export type SctLoHiAirway = {
         coordA: Coordinate_B,
         coordB: Coordinate_B,
     }[]
-    
+
 }
 export type SctGEO = {
     group: string,
@@ -168,7 +161,7 @@ export type EseAirspaceSubsection = {
 export type EseAirspace = {
     sectorline: string,
     displayCondition: EseAirspaceDisplay[],
-    coords: Coordinate_A[],
+    coords: Coordinate_B[],
     subsection: EseAirspaceSubsection,
     active: {
         airport: string,
@@ -179,7 +172,7 @@ export type EseFreetext = {
     coord: Coordinate_B,
     group: string,
     text: string,
-    
+
 }
 export type EsePosition = {
     name: string,
@@ -200,7 +193,7 @@ export type EseSidsStars = {
     runway: string,
     name: string,
     route: string[],
-    
+
 }
 
 

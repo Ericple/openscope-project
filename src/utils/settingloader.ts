@@ -2,12 +2,10 @@ import fs from "fs";
 import * as jschardet from "iconv-jschardet";
 import { ProfileData, SymbologyData, VoiceData } from "../lib/settingtype";
 
-export function LoadSymbology(path: string, callback: (err: NodeJS.ErrnoException | null, data: SymbologyData) => void) : void
-{
-    if(fs.existsSync(path))
-    {
+export function LoadSymbology(path: string, callback: (err: NodeJS.ErrnoException | null, data: SymbologyData) => void): void {
+    if (fs.existsSync(path)) {
         const result: SymbologyData = new SymbologyData();
-        fs.readFile(path,(err,data) => {
+        fs.readFile(path, (err, data) => {
             const encodetype = jschardet.detect(data);
             let decodedData: string[];
             switch (encodetype.encoding) {
@@ -20,8 +18,7 @@ export function LoadSymbology(path: string, callback: (err: NodeJS.ErrnoExceptio
             }
             decodedData.forEach((line) => {
                 const dataline = line.split(":");
-                if(dataline.length == 7)
-                {
+                if (dataline.length == 7) {
                     const hexcolor = dataline[2];
                     result.colors.push({
                         type: dataline[0],
@@ -35,38 +32,31 @@ export function LoadSymbology(path: string, callback: (err: NodeJS.ErrnoExceptio
                         }
                     });
                 }
-                else
-                {
-                    if(dataline[0] == "SYMBOL")
-                    {
+                else {
+                    if (dataline[0] == "SYMBOL") {
                         result.scripts.push({
                             ident: parseInt(dataline[1]),
                             sciprts: []
                         });
                     }
-                    else if(dataline[0] == "SYMBOLITEM")
-                    {
+                    else if (dataline[0] == "SYMBOLITEM") {
                         result.scripts[result.scripts.length - 1].sciprts.push(dataline[1]);
                     }
-                    else if(dataline[0] == "m_ClipArea")
-                    {
+                    else if (dataline[0] == "m_ClipArea") {
                         result.m_ClipArea = parseInt(dataline[1]);
                     }
                 }
             });
-            callback(err,result);
+            callback(err, result);
         });
     }
-    else
-    {
+    else {
         throw `path: ${path} does not exist.`;
     }
 }
 
-export function LoadSymbologySync(path: string) : SymbologyData
-{
-    if(fs.existsSync(path))
-    {
+export function LoadSymbologySync(path: string): SymbologyData {
+    if (fs.existsSync(path)) {
         const result: SymbologyData = new SymbologyData();
         const data = fs.readFileSync(path);
         const encodetype = jschardet.detect(data);
@@ -81,9 +71,8 @@ export function LoadSymbologySync(path: string) : SymbologyData
         }
         decodedData.forEach((line) => {
             const dataline = line.split(":");
-            if(dataline.length == 7)
-            {
-                const color = "#" + parseInt(dataline[2]).toString(16).padStart(6,"0");
+            if (dataline.length == 7) {
+                const color = "#" + parseInt(dataline[2]).toString(16).padStart(6, "0");
                 result.colors.push({
                     type: dataline[0],
                     flag: dataline[1],
@@ -96,39 +85,32 @@ export function LoadSymbologySync(path: string) : SymbologyData
                     }
                 });
             }
-            else
-            {
-                if(dataline[0] == "SYMBOL")
-                {
+            else {
+                if (dataline[0] == "SYMBOL") {
                     result.scripts.push({
                         ident: parseInt(dataline[1]),
                         sciprts: []
                     });
                 }
-                else if(dataline[0] == "SYMBOLITEM")
-                {
+                else if (dataline[0] == "SYMBOLITEM") {
                     result.scripts[result.scripts.length - 1].sciprts.push(dataline[1]);
                 }
-                else if(dataline[0] == "m_ClipArea")
-                {
+                else if (dataline[0] == "m_ClipArea") {
                     result.m_ClipArea = parseInt(dataline[1]);
                 }
             }
         });
         return result;
     }
-    else
-    {
+    else {
         throw `path: ${path} does not exist.`;
     }
 }
 
-export function LoadVoice(path: string, callback: (err: NodeJS.ErrnoException | null, data: VoiceData) => void) : void
-{
-    if(fs.existsSync(path))
-    {
-        const result: VoiceData = new VoiceData(); 
-        fs.readFile(path,(err,data) => {
+export function LoadVoice(path: string, callback: (err: NodeJS.ErrnoException | null, data: VoiceData) => void): void {
+    if (fs.existsSync(path)) {
+        const result: VoiceData = new VoiceData();
+        fs.readFile(path, (err, data) => {
             const encodetype = jschardet.detect(data);
             let decodedData: string[];
             switch (encodetype.encoding) {
@@ -141,8 +123,7 @@ export function LoadVoice(path: string, callback: (err: NodeJS.ErrnoException | 
             }
             decodedData.forEach((line) => {
                 const dataline = line.split(":");
-                if(dataline.length == 5)
-                {
+                if (dataline.length == 5) {
                     result.channels.push({
                         type: dataline[0],
                         name: dataline[1],
@@ -152,19 +133,16 @@ export function LoadVoice(path: string, callback: (err: NodeJS.ErrnoException | 
                     });
                 }
             });
-            callback(err,result);
+            callback(err, result);
         });
     }
-    else
-    {
+    else {
         throw `path: ${path} does not exist.`;
     }
 }
 
-export function LoadVoiceSync(path: string) : VoiceData
-{
-    if(fs.existsSync(path))
-    {
+export function LoadVoiceSync(path: string): VoiceData {
+    if (fs.existsSync(path)) {
         const result: VoiceData = new VoiceData();
         const data = fs.readFileSync(path);
         const encodetype = jschardet.detect(data);
@@ -179,8 +157,7 @@ export function LoadVoiceSync(path: string) : VoiceData
         }
         decodedData.forEach((line) => {
             const dataline = line.split(":");
-            if(dataline.length == 5)
-            {
+            if (dataline.length == 5) {
                 result.channels.push({
                     type: dataline[0],
                     name: dataline[1],
@@ -192,18 +169,15 @@ export function LoadVoiceSync(path: string) : VoiceData
         });
         return result;
     }
-    else
-    {
+    else {
         throw `path: ${path} does not exist.`;
     }
 }
 
-export function LoadProfile(path: string, callback: (err: NodeJS.ErrnoException | null, data: ProfileData) => void) : void
-{
-    if(fs.existsSync(path))
-    {
+export function LoadProfile(path: string, callback: (err: NodeJS.ErrnoException | null, data: ProfileData) => void): void {
+    if (fs.existsSync(path)) {
         const result: ProfileData = new ProfileData();
-        fs.readFile(path,(err,data) => {
+        fs.readFile(path, (err, data) => {
             const encodetype = jschardet.detect(data);
             let decodedData: string[];
             switch (encodetype.encoding) {
@@ -216,14 +190,12 @@ export function LoadProfile(path: string, callback: (err: NodeJS.ErrnoException 
             }
             decodedData.forEach((line) => {
                 //跳过空行
-                if(line == "") return;
+                if (line == "") return;
                 //除去注释
-                if(line.lastIndexOf(";") !== -1) line = line.split(";")[0];
+                if (line.lastIndexOf(";") !== -1) line = line.split(";")[0];
                 const dataline = line.split(":");
-                if(dataline.length == 4)
-                {
-                    if(dataline[0] == "PROFILE")
-                    {
+                if (dataline.length == 4) {
+                    if (dataline[0] == "PROFILE") {
                         result.profile.push({
                             info: {
                                 ident: dataline[1],
@@ -236,35 +208,28 @@ export function LoadProfile(path: string, callback: (err: NodeJS.ErrnoException 
                         });
                     }
                 }
-                if(dataline.length == 2)
-                {
-                    if (dataline[0] == "ATIS2")
-                    {
+                if (dataline.length == 2) {
+                    if (dataline[0] == "ATIS2") {
                         result.profile[result.profile.length - 1].atis2 = dataline[1];
                     }
-                    else if (dataline[0] == "ATIS3")
-                    {
+                    else if (dataline[0] == "ATIS3") {
                         result.profile[result.profile.length - 1].atis3 = dataline[1];
                     }
-                    else if (dataline[0] == "ATIS4")
-                    {
+                    else if (dataline[0] == "ATIS4") {
                         result.profile[result.profile.length - 1].atis4 = dataline[1];
                     }
                 }
             });
-            callback(err,result);
+            callback(err, result);
         });
     }
-    else
-    {
+    else {
         throw `path: ${path} does not exist.`;
     }
 }
 
-export function LoadProfileSync(path: string) : ProfileData
-{
-    if(fs.existsSync(path))
-    {
+export function LoadProfileSync(path: string): ProfileData {
+    if (fs.existsSync(path)) {
         const result: ProfileData = new ProfileData();
         const data = fs.readFileSync(path);
         const encodetype = jschardet.detect(data);
@@ -279,14 +244,12 @@ export function LoadProfileSync(path: string) : ProfileData
         }
         decodedData.forEach((line) => {
             //跳过空行
-            if(line == "") return;
+            if (line == "") return;
             //除去注释
-            if(line.lastIndexOf(";") !== -1) line = line.split(";")[0];
+            if (line.lastIndexOf(";") !== -1) line = line.split(";")[0];
             const dataline = line.split(":");
-            if(dataline.length == 4)
-            {
-                if(dataline[0] == "PROFILE")
-                {
+            if (dataline.length == 4) {
+                if (dataline[0] == "PROFILE") {
                     result.profile.push({
                         info: {
                             ident: dataline[1],
@@ -299,32 +262,27 @@ export function LoadProfileSync(path: string) : ProfileData
                     });
                 }
             }
-            if(dataline.length == 2)
-            {
-                if (dataline[0] == "ATIS2")
-                {
+            if (dataline.length == 2) {
+                if (dataline[0] == "ATIS2") {
                     result.profile[result.profile.length - 1].atis2 = dataline[1];
                 }
-                else if (dataline[0] == "ATIS3")
-                {
+                else if (dataline[0] == "ATIS3") {
                     result.profile[result.profile.length - 1].atis3 = dataline[1];
                 }
-                else if (dataline[0] == "ATIS4")
-                {
+                else if (dataline[0] == "ATIS4") {
                     result.profile[result.profile.length - 1].atis4 = dataline[1];
                 }
             }
         });
         return result;
     }
-    else
-    {
+    else {
         throw `path: ${path} does not exist.`;
     }
 }
 
 export default {
-    LoadSymbology,LoadSymbologySync,
-    LoadVoice,LoadVoiceSync,
-    LoadProfile,LoadProfileSync
+    LoadSymbology, LoadSymbologySync,
+    LoadVoice, LoadVoiceSync,
+    LoadProfile, LoadProfileSync
 }

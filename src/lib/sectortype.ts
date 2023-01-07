@@ -1,17 +1,18 @@
+import { parse2CoordB } from "./coordparser";
 import { AsrDrawItem, AsrSetting, AsrWindowArea, EseAirspace, EseFreetext, EsePosition, EseSidsStars, PrfItem, SctAirport, SctARTCC, SctDefinition, SctFix, SctGEO, SctInfo, SctLoHiAirway, SctREGIONS, SctRunway, SctSIDSTAR, SctVorNdb } from "./datatype";
 
 class AsrData {
     settings: AsrSetting[] = [];
     items: AsrDrawItem[] = [];
     windowArea: AsrWindowArea | null = {
-        coord1:{
-            latitude:"",
-            longitude:""
-        },
-        coord2:{
-            latitude:"",
-            longitude:""
-        }
+        coord1: parse2CoordB({
+            latitude: "N0.0.0.0",
+            longitude: "E0.0.0.0"
+        }),
+        coord2: parse2CoordB({
+            latitude: "N0.0.0.0",
+            longitude: "E0.0.0.0"
+        })
     };
 }
 
@@ -21,7 +22,7 @@ class PrfData {
 
 class SctData {
     definitions: SctDefinition[] = [];
-    info: SctInfo = { copyright:"" };
+    info: SctInfo = { copyright: "" };
     vors: SctVorNdb[] = [];
     ndbs: SctVorNdb[] = [];
     airports: SctAirport[] = [];
@@ -46,5 +47,5 @@ class EseData {
 
 
 export {
-    AsrData,PrfData,EseData,SctData
+    AsrData, PrfData, EseData, SctData
 }

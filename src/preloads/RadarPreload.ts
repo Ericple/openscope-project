@@ -11,22 +11,22 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     const minimizebtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.minimize);
     const canvasScreen = document.getElementById(elementId.RadarWindow.Canvas.screen);
     const sectorbtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.sectorSelect);
-    if(canvasScreen == null) return;
+    if (canvasScreen == null) return;
     sectorbtn?.addEventListener('click', () => {
         ipcRenderer.invoke(ipcChannel.app.update.prfFile);
     });
     canvasScreen.addEventListener('wheel', (e) => {
         drawer.UpdateCanvasIndex(e);
     });
-    canvasScreen.oncontextmenu = function() {
+    canvasScreen.oncontextmenu = function () {
         // const prex = e.offsetX;
         // const prey = e.offsetY;
-        canvasScreen.onmousemove = function(e) {
+        canvasScreen.onmousemove = function (e) {
             // drawer.UpdateCanvasPosXY(ev.pageX - prex, ev.pageY - prey);
             drawer.UpdateCanvasPosXY(e);
         }
     };
-    canvasScreen.onmouseup = function() {
+    canvasScreen.onmouseup = function () {
         canvasScreen.onmousemove = null;
     };
     closebtn?.addEventListener('click', () => {
@@ -41,11 +41,11 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     connectbtn?.addEventListener('click', () => {
         ipcRenderer.invoke(ipcChannel.app.func.connectToNetwork);
     });
-    setInterval(function(){
+    setInterval(function () {
         const date = new Date();
-        const hrs = date.getUTCHours().toString().padStart(2,"0");
-        const min = date.getUTCMinutes().toString().padStart(2,"0");
-        const sec = date.getUTCSeconds().toString().padStart(2,"0");
-        if(timeIndicator !== null) timeIndicator.innerText=`${hrs}:${min}:${sec}`;
+        const hrs = date.getUTCHours().toString().padStart(2, "0");
+        const min = date.getUTCMinutes().toString().padStart(2, "0");
+        const sec = date.getUTCSeconds().toString().padStart(2, "0");
+        if (timeIndicator !== null) timeIndicator.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
 });
