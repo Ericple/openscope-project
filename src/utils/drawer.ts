@@ -118,12 +118,15 @@ export class Drawer {
     }
     public Draw(e?: MouseEvent): void {
         if (this.canvasContext == undefined) return;
+        this.canvasContext.save();
+        this.canvasContext.translate(window.innerWidth/2,window.innerHeight/2);
         this.canvasContext.translate(this.canvasPosX, this.canvasPosY);
         this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
-        if (e !== undefined) {
-            this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
-            this.canvasContext.translate(e.offsetX, e.offsetY);
-        }
+        //由于目前实现的实际体验并不好，因此注释了下方的代码，转而使用缩放保持中心点不动的方法。
+        // if (e !== undefined) {
+        //     // this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
+        //     this.canvasContext.translate((window.innerWidth-e.offsetX)/2, (window.innerHeight-e.offsetY)/2);
+        // }
         if (this.asrCache == undefined) return;
         this.asrCache.items.forEach((item) => {
             if (!item.draw) return;
@@ -151,7 +154,7 @@ export class Drawer {
                 const geogroup = ReadSctGeo(this.sectorCache.GEOs, item.name);
                 const symbol = ReadSymbol(this.symbolCache.colors, item.type, "line");
                 if (geogroup == undefined || symbol == undefined) return;
-                this.canvasContext.lineWidth = symbol.lineWeight;
+                this.canvasContext.lineWidth = symbol.lineWeight + this.canvasIndex / 100000;
                 geogroup.forEach((geo) => {
                     if (this.sectorCache == undefined || this.canvasContext == undefined) return;
                     const colorDef = ReadSctDefine(this.sectorCache.definitions, geo.colorFlag);
@@ -216,10 +219,8 @@ export class Drawer {
             }
             if (item.type == "Regions") {
                 const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);//从缓存中提取出对应regions区域
-                // console.log("got regions of",regions?.items.length,"nodes")
                 if (regions == undefined) return;//如果缓存中不存在该区域，则返回，进行下一次操作
                 regions.items.forEach((item) => {//对每个提取出来的区域进行绘制
-                    // console.log("Drawing region from",item.coords.length,"nodes");
                     if (this.sectorCache == undefined || this.canvasContext == undefined) return;
                     this.canvasContext.beginPath();//开始绘制
                     const color = ReadSctDefine(this.sectorCache.definitions, item.colorFlag);//从缓存中提取出对应的颜色，region的颜色被定义在sct中
@@ -228,20 +229,20 @@ export class Drawer {
                     this.canvasContext.strokeStyle = color;
                     this.canvasContext.fillStyle = color;
                     const count = item.coords.length;//获取坐标总数，为for循环做好准备
-                    // const line = new Path2D();//新建一个二维路径
-                    // line.moveTo(region.coords[0].longtitude * this.canvasIndex, region.coords[0].latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
-                    this.canvasContext.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);
+                    const line = new Path2D();//新建一个二维路径
+                    line.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
+                    // this.canvasContext.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);
                     for (let index = 1; index < count; index++) {//循环绘制下一个坐标
                         const coord = item.coords[index];
                         // console.log("drawing",coord.longtitude, coord.latitude);
-                        // line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
-                        this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                        line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                        // this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                     }
                     // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
-                    // line.closePath();//闭合路径
-                    this.canvasContext.closePath();
-                    this.canvasContext.stroke();
-                    this.canvasContext.fill();
+                    line.closePath();//闭合路径
+                    // this.canvasContext.closePath();
+                    this.canvasContext.stroke(line);
+                    this.canvasContext.fill(line);
                 });
             }
             if (item.type == "Runways") {
@@ -302,7 +303,7 @@ export class Drawer {
                 const symbol = ReadSymbol(this.symbolCache.colors, "Other", item.flag);
                 if (origincoord == undefined) return;
                 if (symbol == undefined) return;
-                this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
+                this.canvasContext.font = symbol.fontSymbolSize * 3.3 + "px Arial";
                 this.canvasContext.fillText(groupandtext[1], origincoord.longtitude * this.canvasIndex, origincoord.latitude * this.canvasIndex);
             }
             if (item.type == "ARTCC boundary") {

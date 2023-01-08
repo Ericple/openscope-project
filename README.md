@@ -25,6 +25,12 @@ All contributions are welcomed. Before forking this repository, please consider 
 - Am I familier with [Euroscope](https://www.euroscope.hu/wp/) and its configuration files?
 - Do I know the basic knowledge of ATC?
 
+## Debug
+
+```
+npm i && npm run start
+```
+
 # Thanks to
 
 - ***iconv-jschardet*** package for supporting gbk format.

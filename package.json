@@ -7,7 +7,8 @@
     "test": "electron ./dist/main.js",
     "compile": "tsc",
     "updateassets": "ts-node CopyAssets.ts",
-    "start": "npm run compile && npm run updateassets && npm run test"
+    "start": "npm run compile && npm run updateassets && npm run test",
+    "quicks": "tsc && electron ./dist/main.js"
   },
   "repository": {
     "type": "git",
