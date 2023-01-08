@@ -4,12 +4,14 @@ import path from "path";
 import fs from "fs";
 import ipcChannel from "./lib/ipcChannel";
 import { DefaultSectorSettingFilePath, RadarWindowFilePath } from "./global";
+
+const METAR_URL = "https://api.aviationapi.com/v1/weather/metar?apt=";
 let RadarWindow: Electron.BrowserWindow;
 
 Electron.Menu.setApplicationMenu(null);
 
 function CreateRadarWindow() {
-
+    Electron.app.name = "OpenScope";
     RadarWindow = new Electron.BrowserWindow({
         minWidth: 1300,//最小宽度1300
         minHeight: 1000,//最小高度1000
@@ -129,3 +131,22 @@ Electron.ipcMain.handle(ipcChannel.app.update.themeSystem, () => {
     Electron.nativeTheme.themeSource = 'system';
     return Electron.nativeTheme.shouldUseDarkColors;
 })
+
+Electron.ipcMain.handle(ipcChannel.app.func.fetchWeather, (e,args: string[]) => {
+    args.forEach((apt) => {
+        if(apt == '.QD') return;
+        if(apt == '') return;
+        const req = Electron.net.request(METAR_URL+apt);
+        req.on('response', (res) => {
+            res.on('data', (chunk) => {
+                const id = `${apt}metar`;
+                const raw = JSON.parse(chunk.toString())[apt]['raw'];
+                RadarWindow.webContents.send(ipcChannel.app.func.fetchWeather, {
+                    id: id,
+                    raw: raw
+                });
+            });
+        });
+        req.end();
+    });
+});

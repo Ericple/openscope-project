@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import ipcChannel from "../lib/ipcChannel";
 import elementId from "../lib/elementId";
 import Drawer from "../utils/drawer";
+
 contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     const drawer = new Drawer(rootElement);
     const connectbtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.connect);
@@ -12,7 +13,35 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     const canvasScreen = document.getElementById(elementId.RadarWindow.Canvas.screen);
     const sectorbtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.sectorSelect);
     const themebtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.theme);
-    
+    const msgbox = document.querySelectorAll('input')[0];
+    const metarContainer = document.getElementById(elementId.RadarWindow.Appbar.Container.metar);
+    function defaultKeyDown(e:KeyboardEvent){
+        if(msgbox == null) return;
+        if(e.code == 'F2') {
+            msgbox.value = '.QD ';
+            msgbox.focus();
+        }
+    }
+    window.onkeydown = defaultKeyDown;
+    msgbox?.addEventListener('focusin', () => {
+        if(msgbox == null) return;
+        window.onkeydown = function (e) {
+            switch(e.key){
+                case 'Enter':
+                    ResolveBoxData(msgbox.value.toUpperCase());
+                    msgbox.value = '';
+                    break;
+                default:
+                    defaultKeyDown(e);
+                    break;
+            }
+        }
+    })
+
+    msgbox?.addEventListener('focusout', () => {
+        window.onkeydown = defaultKeyDown;
+    })
+
     ipcRenderer.invoke(ipcChannel.app.update.themeSystem);
     themebtn?.addEventListener('click', () => {
         ipcRenderer.invoke(ipcChannel.app.update.theme);
@@ -54,4 +83,40 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
         const sec = date.getUTCSeconds().toString().padStart(2, "0");
         if (timeIndicator !== null) timeIndicator.innerText = `${hrs}:${min}:${sec}`;
     }, 1000);
+    function ResolveBoxData(data: string | null) {
+        if(data == null) return;
+        if(data.startsWith(".QD")){
+            const apts = data.split(" ");
+            apts.forEach((apt) => {
+                if(apt=='.QD') return;
+                if(apt=='') {
+                    const existtags = document.getElementsByClassName('appbar-metar-tag');
+                    for (let index = 0; index < existtags.length; index++) {
+                        const el = existtags.item(index);
+                        if(el !== null) metarContainer?.removeChild(el);
+                    }
+                    return;
+                }
+                const tag = document.createElement('a');
+                tag.className = 'appbar-menu-item';
+                tag.classList.add('appbar-metar-tag');
+                tag.id = apt + 'metar';
+                tag.innerText = `${apt} - Fetching...`;
+                const existtag = document.getElementById(apt+'metar');
+                if(existtag == null) {
+                    metarContainer?.appendChild(tag);
+                }else{
+                    metarContainer?.removeChild(existtag);
+                    metarContainer?.appendChild(tag);
+                }
+            });
+            ipcRenderer.invoke(ipcChannel.app.func.fetchWeather, apts);
+        }
+    
+    }
+    ipcRenderer.on(ipcChannel.app.func.fetchWeather, (e, args) => {
+        const tag = document.getElementById(args.id);
+        if(tag == null) return;
+        tag.innerText = args.raw;
+    });
 });

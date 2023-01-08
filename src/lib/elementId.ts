@@ -22,6 +22,9 @@ export const elementId = {
                 currentTime: "appbar-utc-time",
                 currentCoord: "appbar-coordinate"
             },
+            Container: {
+                metar: "app-bar"
+            }
         },
         Canvas: {
             screen: "app"

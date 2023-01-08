@@ -663,9 +663,9 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     if (line == "") return;
                     //读取
                     const dataline = line.split(" ");
-                    if (dataline.length == 4 && dataline[0] !== result.REGIONs[result.REGIONs.length - 1].group) {
+                    if (dataline.length == 4 && dataline[0] !== result.REGIONs[result.REGIONs.length - 1].regionName) {
                         result.REGIONs.push({
-                            group: dataline[0],
+                            regionName: dataline[0],
                             items: [{
                                 colorFlag: dataline[1],
                                 coords: [parse2CoordB({
@@ -1225,14 +1225,39 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 if (line.lastIndexOf(";") !== -1) line = line.split(";")[0];
                 //跳过空行
                 if (line == "") return;
+                if (line.startsWith("REGIONNAME")) {
+                    result.REGIONs.push({
+                        regionName: line.replace("REGIONNAME ",""),
+                        items: []
+                    });
+                    return;
+                }
                 //读取
-                const dataline = line.split(" ");
+                const dataline = line.trim().split(" ");
+                if(dataline.length == 3){
+                    result.REGIONs[result.REGIONs.length - 1].items.push({
+                        colorFlag: dataline[0],
+                        coords: [parse2CoordB({
+                            latitude: dataline[1], longitude: dataline[2]
+                        })]
+                    });
+                    return;
+                }
+                if(dataline.length == 2){
+                    result.REGIONs[result.REGIONs.length - 1].items[result.REGIONs[result.REGIONs.length - 1].items.length - 1].coords.push(parse2CoordB(
+                        {
+                            latitude: dataline[0],
+                            longitude: dataline[1]
+                        }
+                    ));
+                    return;
+                }
                 //四行则新建item
-                if(dataline.length == 4){
+                if (dataline.length == 4) {
                     //为空则直接插入
-                    if(result.REGIONs.length == 0){
+                    if (result.REGIONs.length == 0) {
                         result.REGIONs.push({
-                            group: dataline[0],
+                            regionName: dataline[0],
                             items: [{
                                 colorFlag: dataline[1],
                                 coords: [parse2CoordB({
@@ -1240,19 +1265,19 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                                 })]
                             }],
                         });
-                    }else{//不为空先判断和最后加入的是否为同一组
+                    } else {//不为空先判断和最后加入的是否为同一组
                         //是则插入到最后一项中的items里
-                        if(dataline[0] == result.REGIONs[result.REGIONs.length - 1].group){
+                        if (dataline[0] == result.REGIONs[result.REGIONs.length - 1].regionName) {
                             result.REGIONs[result.REGIONs.length - 1].items.push({
                                 colorFlag: dataline[1],
                                 coords: [parse2CoordB({
                                     latitude: dataline[2], longitude: dataline[3]
                                 })]
                             });
-                        }else{
+                        } else {
                             //否则新建
                             result.REGIONs.push({
-                                group: dataline[0],
+                                regionName: dataline[0],
                                 items: [{
                                     colorFlag: dataline[1],
                                     coords: [parse2CoordB({
@@ -1262,14 +1287,6 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                             });
                         }
                     }
-                }else{
-                    //两行则直接插入最后一项的item的coords
-                    result.REGIONs[result.REGIONs.length - 1].items[result.REGIONs[result.REGIONs.length - 1].items.length - 1].coords.push(parse2CoordB(
-                        {
-                            latitude: dataline[0],
-                            longitude: dataline[1]
-                        }
-                    ))
                 }
             }
         });
@@ -1622,7 +1639,7 @@ export function LoadEseFileSync(path: string): sectortype.EseData {
 export function ReadPrfData(data: sectortype.PrfData, flag: string): string | undefined {
     for (let index = 0; index < data.settings.length; index++) {
         const item = data.settings[index];
-        if (index < data.settings.length && item.flag == flag) return item.data.substring(0, item.data.length - 1);
+        if (index < data.settings.length && item.flag == flag) return item.data.trim();//substring(0, item.data.length - 1);
     }
 }
 
@@ -1669,7 +1686,7 @@ export function ReadSctGeo(data: SctGEO[], group: string) {
 export function ReadSctRegions(data: SctREGIONS[], group: string) {
     for (let index = 0; index < data.length; index++) {
         const region = data[index];
-        if (region.group == group) return region;
+        if (region.regionName == group) return region;
     }
 }
 

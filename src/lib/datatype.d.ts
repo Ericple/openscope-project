@@ -137,7 +137,7 @@ export type SctGEO = {
     }[],
 }
 export type SctREGIONS = {
-    group: string,
+    regionName: string,
     items: {
         colorFlag: string,
         coords: Coordinate_B[],

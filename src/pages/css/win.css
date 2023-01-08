@@ -41,7 +41,7 @@
         background: url('../assets/image/display.grey.svg') no-repeat center #1f1d1d;
     }
 
-    
+
 
     a.appbar-menu-item {
         color: whitesmoke;
@@ -62,11 +62,11 @@
     div.footer-channel-chooser a.channel:hover {
         color: white;
     }
-    
+
     div.footer-channel-chooser a.channel:active {
         color: rgb(207, 135, 0) #323232;
     }
-    
+
     div.footer-channel-message {
         color: white;
     }
@@ -74,7 +74,7 @@
     ::-webkit-scrollbar-track {
         background-color: #353535;
     }
-    
+
     ::-webkit-scrollbar-thumb {
         background-color: #d3d3d362;
     }
@@ -86,31 +86,31 @@
     button#button-display {
         background: url('../assets/image/display.grey.svg') no-repeat center;
     }
-    
+
     button#button-voice {
         background: url('../assets/image/voice.grey.svg') no-repeat center;
     }
-    
+
     button#button-setting {
         background: url('../assets/image/setting.grey.svg') no-repeat center;
     }
-    
+
     button#button-atis {
         background: url('../assets/image/radar.grey.svg') no-repeat center;
     }
-    
+
     button#button-output {
         background: url('../assets/image/headset.grey.svg') no-repeat center;
     }
-    
+
     button#button-runway {
         background: url('../assets/image/runway.white.large.svg') no-repeat center;
     }
-    
+
     button#button-select-sector {
         background: url('../assets/image/open.grey.svg') no-repeat center;
     }
-    
+
     button#button-close-app {
         background: url('../assets/image/close.white.svg') no-repeat center;
         right: 0;
@@ -120,7 +120,7 @@
         background: url('../assets/image/restore.white.svg') no-repeat center;
         right: 36px;
     }
-    
+
     button#button-minimize-app {
         background: url('../assets/image/minimize.white.svg') no-repeat center;
         right: 72px;
@@ -193,11 +193,11 @@
     div.footer-channel-chooser a.channel:hover {
         color: white;
     }
-    
+
     div.footer-channel-chooser a.channel:active {
         color: rgb(207, 135, 0) #323232;
     }
-    
+
     div.footer-channel-message {
         color: rgb(51, 51, 51);
     }
@@ -205,7 +205,7 @@
     ::-webkit-scrollbar-track {
         background-color: #a5a5a5;
     }
-    
+
     ::-webkit-scrollbar-thumb {
         background-color: #d3d3d362;
     }
@@ -213,31 +213,31 @@
     button#button-display {
         background: url('../assets/image/display.dark.svg') no-repeat center;
     }
-    
+
     button#button-voice {
         background: url('../assets/image/voice.dark.svg') no-repeat center;
     }
-    
+
     button#button-setting {
         background: url('../assets/image/setting.dark.svg') no-repeat center;
     }
-    
+
     button#button-atis {
         background: url('../assets/image/radar.dark.svg') no-repeat center;
     }
-    
+
     button#button-output {
         background: url('../assets/image/headset.dark.svg') no-repeat center;
     }
-    
+
     button#button-runway {
         background: url('../assets/image/runway.dark.large.svg') no-repeat center;
     }
-    
+
     button#button-select-sector {
         background: url('../assets/image/open.dark.svg') no-repeat center;
     }
-    
+
     button#button-close-app {
         background: url('../assets/image/close.dark.svg') no-repeat center;
         right: 0;
@@ -247,11 +247,124 @@
         background: url('../assets/image/restore.dark.svg') no-repeat center;
         right: 36px;
     }
-    
+
     button#button-minimize-app {
         background: url('../assets/image/minimize.dark.svg') no-repeat center;
         right: 72px;
     }
+}
+
+div.tag-list {
+    position: fixed;
+    height: calc(100% - 136px);
+    left: 0;
+    top: 36px;
+    width: 208px;
+    background: rgba(0, 0, 0, 0.05);
+    overflow-y: hidden;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+div.tag-list:hover {
+    overflow-y: auto;
+}
+
+div.tag-item {
+    position: relative;
+    margin: 3px;
+    box-sizing: border-box;
+    background-color: #32323256;
+    width: 202px;
+    height: 80px;
+    border-radius: 4px;
+    user-select: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+input.tag-list-searchbox {
+    border: none;
+    outline: none;
+    width: 202px;
+    margin: 3px;
+    margin-bottom: 0;
+    border-radius: 4px;
+    height: 24px;
+    background-color: #32323256;
+    color: #cbcbcb;
+}
+
+div.tag-item {
+    font-weight: bold;
+}
+
+div.tag-item:hover {
+    box-shadow: 0 5px 12px 4px rgba(255, 255, 255, 0.336);
+}
+
+div.tag-item a {
+    margin: 4px 8px 4px 8px;
+}
+
+div.tag-item a.tag-ac-cs {
+    top: 6px;
+    position: relative;
+    font-size: large;
+    color: #cbcbcb;
+}
+
+div.tag-item a.tag-ac-type {
+    position: relative;
+    top: 6px;
+    color: #cbcbcb;
+    font-size: small;
+}
+
+div.tag-item a.tag-ac-stat {
+    position: relative;
+    top: 6px;
+    color: #cbcbcb;
+}
+
+div.tag-item a.tag-ac-alt {
+    position: relative;
+    display: inline-block;
+    color: orange;
+    font-size: small;
+}
+
+div.tag-item a.tag-ac-dep {
+    position: relative;
+    color: #cbcbcb;
+    font-size: small;
+}
+
+div.tag-item a.tag-ac-arr {
+    position: relative;
+    font-size: small;
+    color: #cbcbcb;
+}
+
+div.tag-item a.tag-ac-alt-target {
+    position: relative;
+    font-size: small;
+    color: #cbcbcb;
+    bottom: 5px;
+}
+
+div.tag-item div.tag-warning {
+    background-color: green;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    border-radius: 0 0 4px 4px;
+    color: #cbcbcb;
+    height: 20px;
+    font-size: small;
+    line-height: 20px;
+    padding-left: 8px;
+    box-sizing: border-box;
 }
 
 * {

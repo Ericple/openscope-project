@@ -10,6 +10,12 @@ import { SctSIDSTAR, SctVorNdb } from "../lib/datatype";
 import fs from 'fs';
 import { DefaultSectorSettingFilePath } from "../global";
 
+const SCROLL_INDEX = 1.2;
+const AP_FREETEXT_LIMIT = 20000;//要显示机场FREETEXT的最小缩放倍数
+const FIX_NAME_LIMIT = 150;
+const AW_NAME_LIMIT_MIN = 100;
+const AW_NAME_LIMIT_MAX = 150;
+const ZOOM_INDEX_MAX = 250000;//最大缩放倍数
 export class Drawer {
     public rootElement: HTMLElement | null;
     public canvas: HTMLCanvasElement;
@@ -65,15 +71,42 @@ export class Drawer {
         this.canvasPosX = xresult;
         this.canvasPosY = yresult;
         if (event.deltaY < 0) {
-            const result = this.canvasIndex * 1.1;
-            if (result < 300000) this.canvasIndex = result;
+            const result = this.canvasIndex * SCROLL_INDEX;
+            if (result < ZOOM_INDEX_MAX) this.canvasIndex = result;
         }
         else {
-            const result = this.canvasIndex / 1.1;
+            const result = this.canvasIndex / SCROLL_INDEX;
             if (result > 1) this.canvasIndex = result;
         }
+        if (this.canvasIndex < AP_FREETEXT_LIMIT) {
+            this.asrCache?.items.forEach((item) => {
+                if (item.name.lastIndexOf("\\") !== -1) item.draw = false;
+            });
+        } else {
+            this.asrCache?.items.forEach((item) => {
+                if (item.name.lastIndexOf("\\") !== -1) item.draw = true;
+            });
+        }
+        if (this.canvasIndex < FIX_NAME_LIMIT) {
+            this.asrCache?.items.forEach((item) => {
+                if (item.type == "Fixes") item.draw = false;
+            });
+        } else {
+            this.asrCache?.items.forEach((item) => {
+                if (item.type == "Fixes") item.draw = true;
+            });
+        }
+        if (this.canvasIndex > AW_NAME_LIMIT_MIN && this.canvasIndex < AW_NAME_LIMIT_MAX) {
+            this.asrCache?.items.forEach((item) => {
+                if (item.type.endsWith("airways") && item.flag == "name") item.draw = true;
+            });
+        } else {
+            this.asrCache?.items.forEach((item) => {
+                if (item.type.endsWith("airways") && item.flag == "name") item.draw = false;
+            });
+        }
         if (this.coordIndicator == null) return;
-        this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX} Index: ${this.canvasIndex}`;
+        this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX}`;
         this.ClearCanvas(event);
     }
     public UpdateCanvasPosXY(e: MouseEvent): void {
@@ -82,7 +115,7 @@ export class Drawer {
         this.canvasPosX = xresult;
         this.canvasPosY = yresult;
         if (this.coordIndicator == null) return;
-        this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX} Index: ${this.canvasIndex}`;
+        this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX}`;
         this.ClearCanvas(e);
     }
     /**
@@ -118,8 +151,7 @@ export class Drawer {
     }
     public Draw(e?: MouseEvent): void {
         if (this.canvasContext == undefined) return;
-        this.canvasContext.save();
-        this.canvasContext.translate(window.innerWidth/2,window.innerHeight/2);
+        this.canvasContext.translate(window.innerWidth / 2, window.innerHeight / 2);
         this.canvasContext.translate(this.canvasPosX, this.canvasPosY);
         this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
         //由于目前实现的实际体验并不好，因此注释了下方的代码，转而使用缩放保持中心点不动的方法。
@@ -128,6 +160,37 @@ export class Drawer {
         //     this.canvasContext.translate((window.innerWidth-e.offsetX)/2, (window.innerHeight-e.offsetY)/2);
         // }
         if (this.asrCache == undefined) return;
+        this.asrCache.items.forEach((item) => {
+            if (this.sectorCache == undefined || this.symbolCache == undefined) return;
+            if (item.type == "Regions") {
+                const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);//从缓存中提取出对应regions区域
+                if (regions == undefined) return;//如果缓存中不存在该区域，则返回，进行下一次操作
+                regions.items.forEach((item) => {//对每个提取出来的区域进行绘制
+                    if (this.sectorCache == undefined || this.canvasContext == undefined) return;
+                    this.canvasContext.beginPath();//开始绘制
+                    const color = ReadSctDefine(this.sectorCache.definitions, item.colorFlag);//从缓存中提取出对应的颜色，region的颜色被定义在sct中
+                    if (color == undefined) return;//如果sct中不存在对应的颜色flag定义，说明扇区有问题或读取失败
+                    this.canvasContext.lineWidth = 0.1;
+                    this.canvasContext.strokeStyle = color;
+                    this.canvasContext.fillStyle = color;
+                    const count = item.coords.length;//获取坐标总数，为for循环做好准备
+                    const line = new Path2D();//新建一个二维路径
+                    line.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
+                    // this.canvasContext.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);
+                    for (let index = 1; index < count; index++) {//循环绘制下一个坐标
+                        const coord = item.coords[index];
+                        // console.log("drawing",coord.longtitude, coord.latitude);
+                        line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                        // this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                    }
+                    // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
+                    line.closePath();//闭合路径
+                    // this.canvasContext.closePath();
+                    this.canvasContext.stroke(line);
+                    this.canvasContext.fill(line);
+                });
+            }
+        })
         this.asrCache.items.forEach((item) => {
             if (!item.draw) return;
             if (this.canvasContext == null) return;
@@ -215,34 +278,6 @@ export class Drawer {
                         this.canvasContext.strokeStyle = symbol.color;
                         this.canvasContext.stroke(line);
                     }
-                });
-            }
-            if (item.type == "Regions") {
-                const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);//从缓存中提取出对应regions区域
-                if (regions == undefined) return;//如果缓存中不存在该区域，则返回，进行下一次操作
-                regions.items.forEach((item) => {//对每个提取出来的区域进行绘制
-                    if (this.sectorCache == undefined || this.canvasContext == undefined) return;
-                    this.canvasContext.beginPath();//开始绘制
-                    const color = ReadSctDefine(this.sectorCache.definitions, item.colorFlag);//从缓存中提取出对应的颜色，region的颜色被定义在sct中
-                    if (color == undefined) return;//如果sct中不存在对应的颜色flag定义，说明扇区有问题或读取失败
-                    this.canvasContext.lineWidth = 0.1;
-                    this.canvasContext.strokeStyle = color;
-                    this.canvasContext.fillStyle = color;
-                    const count = item.coords.length;//获取坐标总数，为for循环做好准备
-                    const line = new Path2D();//新建一个二维路径
-                    line.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
-                    // this.canvasContext.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);
-                    for (let index = 1; index < count; index++) {//循环绘制下一个坐标
-                        const coord = item.coords[index];
-                        // console.log("drawing",coord.longtitude, coord.latitude);
-                        line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
-                        // this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
-                    }
-                    // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
-                    line.closePath();//闭合路径
-                    // this.canvasContext.closePath();
-                    this.canvasContext.stroke(line);
-                    this.canvasContext.fill(line);
                 });
             }
             if (item.type == "Runways") {

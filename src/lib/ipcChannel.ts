@@ -18,7 +18,8 @@ export const ipcChannel = {
             warning: "app.wrnmsg"
         },
         func: {
-            connectToNetwork: "app.func.connecttonetwork"
+            connectToNetwork: "app.func.connecttonetwork",
+            fetchWeather: "app.func.fetchweather"
         }
     }
 }
