@@ -27,9 +27,13 @@ All contributions are welcomed. Before forking this repository, please consider 
 
 ## Debug
 
+For the first start, run:
+
 ```
 npm i && npm run start
 ```
+
+Afterwards, use `npm run quicks` to start.
 
 # Thanks to
 
