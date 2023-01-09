@@ -42,9 +42,11 @@ Afterwards, use `npm run quicks` to start.
 
 - ***Wenlue Zhang*** for pointing out the sucked code for UTC Time Display interval function.
 
+- ***Ian Cowan*** for his free [AviationAPI](https://aviationapi.com/about)
+
 # FAQ
 
-- The freetexts are covered by the airport polygon, what should I do?
+<del>- The freetexts are covered by the airport polygon, what should I do?</del> ***(This bug should have been fixed)***
   - Please refers to the .asr file your sector loads, open it with the text editor you like, find those lines prefixed with "Regions:", cut all these lines and paste it under "SECTORTITLE:", like the example below：
   ```
     DisplayTypeName:Standard ES radar screen
@@ -57,3 +59,6 @@ Afterwards, use `npm run quicks` to start.
     Regions:ZSPD:polygon
     ......
   ```
+
+- How to request metar in openscope?
+  - Just the same as in Euroscope.

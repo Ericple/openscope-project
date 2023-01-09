@@ -1,6 +1,6 @@
 {
   "name": "openscope-project",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "open source successor of euroscope power of control",
   "main": "./dist/main.js",
   "scripts": {

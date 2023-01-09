@@ -34,11 +34,9 @@ export class Drawer {
     constructor(rootElement: string) {
         this.canvas = document.createElement('canvas');
         this.canvasContext = this.canvas.getContext('2d');
-        if (this.canvasContext == undefined) throw "";
         this.coordIndicator = document.getElementById(elementId.RadarWindow.Appbar.Tags.currentCoord);
         this.rootElement = document.getElementById(rootElement);
-        if (this.rootElement == undefined) throw "";
-        this.rootElement.appendChild(this.canvas);
+        this.rootElement?.appendChild(this.canvas);
         this.canvasIndex = 1;
         this.canvasPosX = 0;
         this.canvasPosY = 0;
@@ -51,19 +49,17 @@ export class Drawer {
             const sectorindicator = document.getElementById(elementId.RadarWindow.Appbar.Tags.currentSector);
             if (sectorindicator !== null) sectorindicator.innerText = path.basename(args.path);
             //更新默认开启扇区
-            fs.writeFile(DefaultSectorSettingFilePath, args.path, 'utf-8', (err) => {
-                if (err) throw err;
-            });
+            fs.writeFileSync(DefaultSectorSettingFilePath, args.path, 'utf-8');
             //更新绘制缓存
             this.UpdateCache(args.path);
             //绘制
             this.ClearCanvas();
         });
     }
-    public ClearCanvas(e?: MouseEvent): void {
+    public ClearCanvas(): void {
         this.canvas.height = window.innerHeight - 136;
         this.canvas.width = window.innerWidth;
-        this.Draw(e);
+        this.Draw();
     }
     public UpdateCanvasIndex(event: WheelEvent): void {
         const xresult = this.canvasPosX + (event.movementX) / this.canvasIndex;
@@ -78,6 +74,9 @@ export class Drawer {
             const result = this.canvasIndex / SCROLL_INDEX;
             if (result > 1) this.canvasIndex = result;
         }
+        /**
+         * 检测canvasIndex是否小于绘制FREETEXT的最低要求
+         */
         if (this.canvasIndex < AP_FREETEXT_LIMIT) {
             this.asrCache?.items.forEach((item) => {
                 if (item.name.lastIndexOf("\\") !== -1) item.draw = false;
@@ -87,6 +86,9 @@ export class Drawer {
                 if (item.name.lastIndexOf("\\") !== -1) item.draw = true;
             });
         }
+        /**
+         * 检测canvasIndex是否小于绘制FIXNAME的最低要求
+         */
         if (this.canvasIndex < FIX_NAME_LIMIT) {
             this.asrCache?.items.forEach((item) => {
                 if (item.type == "Fixes") item.draw = false;
@@ -96,6 +98,9 @@ export class Drawer {
                 if (item.type == "Fixes") item.draw = true;
             });
         }
+        /**
+         * 检测canvasIndex是否在限定绘制Airways name的范围
+         */
         if (this.canvasIndex > AW_NAME_LIMIT_MIN && this.canvasIndex < AW_NAME_LIMIT_MAX) {
             this.asrCache?.items.forEach((item) => {
                 if (item.type.endsWith("airways") && item.flag == "name") item.draw = true;
@@ -105,18 +110,18 @@ export class Drawer {
                 if (item.type.endsWith("airways") && item.flag == "name") item.draw = false;
             });
         }
-        if (this.coordIndicator == null) return;
+        if (!this.coordIndicator) return;
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX}`;
-        this.ClearCanvas(event);
+        this.ClearCanvas();
     }
     public UpdateCanvasPosXY(e: MouseEvent): void {
         const xresult = this.canvasPosX + (e.movementX) / this.canvasIndex;
         const yresult = this.canvasPosY + (e.movementY) / this.canvasIndex;
         this.canvasPosX = xresult;
         this.canvasPosY = yresult;
-        if (this.coordIndicator == null) return;
+        if (!this.coordIndicator) return;
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX}`;
-        this.ClearCanvas(e);
+        this.ClearCanvas();
     }
     /**
      * 更新绘制缓存
@@ -125,51 +130,46 @@ export class Drawer {
     public UpdateCache(prfPath: string): void {
         this.prfCache = LoadPrfFileSync(prfPath);
         let asrpath = ReadPrfData(this.prfCache, "Recent1");
-        if (asrpath == undefined) return;
+        if (!asrpath) return;
         asrpath = path.join(prfPath, "..", AlignPath(asrpath));
         this.asrCache = LoadAsrFileSync(asrpath);
         let sctpath = ReadPrfData(this.prfCache, "sector");
-        if (sctpath == undefined) return;
+        if (!sctpath) return;
         sctpath = path.join(prfPath, "..", AlignPath(sctpath));
         this.sectorCache = LoadSctFileSync(sctpath);
         const esepath = ConvertEsePath(sctpath);
         this.eseCache = LoadEseFileSync(esepath);
         let symbologypath = ReadPrfData(this.prfCache, "SettingsfileSYMBOLOGY");
-        if (symbologypath == undefined) return;
+        if (!symbologypath) return;
         symbologypath = path.join(prfPath, "..", AlignPath(symbologypath));
         this.symbolCache = LoadSymbologySync(symbologypath);
         const backgroundColor = ReadSymbol(this.symbolCache.colors, "Sector", "active sector background")?.color;
         if (backgroundColor !== undefined) this.canvas.style.backgroundColor = backgroundColor;
         let voicepath = ReadPrfData(this.prfCache, "SettingsfileVOICE");
-        if (voicepath == undefined) return;
+        if (!voicepath) return;
         voicepath = path.join(prfPath, "..", AlignPath(voicepath));
         this.voiceCache = LoadVoiceSync(voicepath);
         let profilepath = ReadPrfData(this.prfCache, "SettingsfilePROFILE");
-        if (profilepath == undefined) throw "Invalid profile settings file";
+        if (!profilepath) return;
         profilepath = path.join(prfPath, "..", AlignPath(profilepath));
         this.profileCache = LoadProfileSync(profilepath);
     }
-    public Draw(e?: MouseEvent): void {
-        if (this.canvasContext == undefined) return;
+    public Draw(): void {
+        if (!this.canvasContext) return;
         this.canvasContext.translate(window.innerWidth / 2, window.innerHeight / 2);
         this.canvasContext.translate(this.canvasPosX, this.canvasPosY);
         this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
-        //由于目前实现的实际体验并不好，因此注释了下方的代码，转而使用缩放保持中心点不动的方法。
-        // if (e !== undefined) {
-        //     // this.canvasContext.translate(this.canvasPosX * (this.canvasIndex - 1), this.canvasPosY * (this.canvasIndex - 1));
-        //     this.canvasContext.translate((window.innerWidth-e.offsetX)/2, (window.innerHeight-e.offsetY)/2);
-        // }
-        if (this.asrCache == undefined) return;
+        if (!this.asrCache) return;
         this.asrCache.items.forEach((item) => {
-            if (this.sectorCache == undefined || this.symbolCache == undefined) return;
+            if (!this.sectorCache || !this.symbolCache) return;
             if (item.type == "Regions") {
                 const regions = ReadSctRegions(this.sectorCache.REGIONs, item.name);//从缓存中提取出对应regions区域
-                if (regions == undefined) return;//如果缓存中不存在该区域，则返回，进行下一次操作
+                if (!regions) return;//如果缓存中不存在该区域，则返回，进行下一次操作
                 regions.items.forEach((item) => {//对每个提取出来的区域进行绘制
-                    if (this.sectorCache == undefined || this.canvasContext == undefined) return;
+                    if (!this.sectorCache || !this.canvasContext) return;
                     this.canvasContext.beginPath();//开始绘制
                     const color = ReadSctDefine(this.sectorCache.definitions, item.colorFlag);//从缓存中提取出对应的颜色，region的颜色被定义在sct中
-                    if (color == undefined) return;//如果sct中不存在对应的颜色flag定义，说明扇区有问题或读取失败
+                    if (!color) return;//如果sct中不存在对应的颜色flag定义，说明扇区有问题或读取失败
                     this.canvasContext.lineWidth = 0.1;
                     this.canvasContext.strokeStyle = color;
                     this.canvasContext.fillStyle = color;
@@ -193,14 +193,14 @@ export class Drawer {
         })
         this.asrCache.items.forEach((item) => {
             if (!item.draw) return;
-            if (this.canvasContext == null) return;
-            if (this.sectorCache == undefined || this.symbolCache == undefined || this.eseCache == undefined) return;
+            if (!this.canvasContext) return;
+            if (!this.sectorCache || !this.symbolCache || !this.eseCache) return;
             if (item.type == "Fixes")//绘制fix的symbol或name
             {
                 const coord = ReadSctFix(this.sectorCache.fixes, item.name);
-                if (coord == undefined) return;
+                if (!coord) return;
                 const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
-                if (symbol == undefined) return;
+                if (!symbol) return;
                 this.canvasContext.fillStyle = symbol.color;
                 if (item.flag == "name") {
                     this.canvasContext.font = symbol.fontSymbolSize * 2.5 + "px Arial";
@@ -216,12 +216,12 @@ export class Drawer {
             {
                 const geogroup = ReadSctGeo(this.sectorCache.GEOs, item.name);
                 const symbol = ReadSymbol(this.symbolCache.colors, item.type, "line");
-                if (geogroup == undefined || symbol == undefined) return;
+                if (!geogroup || !symbol) return;
                 this.canvasContext.lineWidth = symbol.lineWeight + this.canvasIndex / 100000;
                 geogroup.forEach((geo) => {
-                    if (this.sectorCache == undefined || this.canvasContext == undefined) return;
+                    if (!this.sectorCache || !this.canvasContext) return;
                     const colorDef = ReadSctDefine(this.sectorCache.definitions, geo.colorFlag);
-                    if (colorDef == undefined) return;
+                    if (!colorDef) return;
                     const line = new Path2D();
                     line.moveTo(geo.coordA.longtitude * this.canvasIndex, geo.coordA.latitude * this.canvasIndex);
                     line.lineTo(geo.coordB.longtitude * this.canvasIndex, geo.coordB.latitude * this.canvasIndex);
@@ -233,11 +233,11 @@ export class Drawer {
             {
                 const aw = ReadSctLoHiAw(this.sectorCache.hiAirways, item.name);
                 // console.log(aw)
-                if (aw == undefined) return;
+                if (!aw) return;
                 aw.coords.forEach(coord => {
-                    if (coord == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
+                    if (!coord || !this.symbolCache || !this.canvasContext) return;
                     const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
-                    if (symbol == undefined) return;
+                    if (!symbol) return;
                     const line = new Path2D();
                     line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
                     line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
@@ -257,13 +257,11 @@ export class Drawer {
             {
                 const aw = ReadSctLoHiAw(this.sectorCache.hiAirways, item.name);
                 // console.log(aw);
-                if (aw == undefined) return;
+                if (!aw) return;
                 aw.coords.forEach(coord => {
-                    // console.log("trying to draw loaw...",coordA.latitude,coordA.longtitude,coordB.latitude,coordB.longtitude)
-                    if (coord == undefined || this.symbolCache == undefined || this.canvasContext == undefined) return;
+                    if (!coord || !this.symbolCache || !this.canvasContext) return;
                     const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
-                    console.log(symbol);
-                    if (symbol == undefined) return;
+                    if (!symbol) return;
                     const line = new Path2D();
                     line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
                     line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
@@ -284,7 +282,7 @@ export class Drawer {
                 const nameItems = item.name.split(" ");
                 const runway = ReadSctRunway(this.sectorCache.runways, nameItems[0], nameItems[2]);
                 const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
-                if (runway == undefined || symbol == undefined) return;
+                if (!runway || !symbol) return;
                 this.canvasContext.strokeStyle = symbol.color;
                 this.canvasContext.font = symbol.fontSymbolSize * 2.3 + "px Arial";
                 if (item.flag == "name") {
@@ -302,9 +300,9 @@ export class Drawer {
                 let vorndb: SctVorNdb | undefined;
                 if (item.type == "NDBs") vorndb = ReadSctVORNDB(this.sectorCache.ndbs, item.name);
                 if (item.type == "VORs") vorndb = ReadSctVORNDB(this.sectorCache.vors, item.name);
-                if (vorndb == undefined) return;
+                if (!vorndb) return;
                 const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
-                if (symbol == undefined) return;
+                if (!symbol) return;
                 this.canvasContext.fillStyle = symbol.color;
                 const size = symbol.fontSymbolSize;
                 this.canvasContext.font = size * 2.3 + "px Arial";
@@ -318,9 +316,9 @@ export class Drawer {
             }
             if (item.type == "Airports") {
                 const airport = ReadSctAirport(this.sectorCache.airports, item.name);
-                if (airport == undefined) return;
+                if (!airport) return;
                 const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
-                if (symbol == undefined) return;
+                if (!symbol) return;
                 this.canvasContext.fillStyle = symbol.color;
                 const size = symbol.fontSymbolSize;
                 this.canvasContext.font = size * 2.3 + "px Arial";
@@ -336,15 +334,15 @@ export class Drawer {
                 const groupandtext = item.name.split("\\");
                 const origincoord = ReadEseFreeText(this.eseCache.freetexts, groupandtext[0], groupandtext[1]);
                 const symbol = ReadSymbol(this.symbolCache.colors, "Other", item.flag);
-                if (origincoord == undefined) return;
-                if (symbol == undefined) return;
+                if (!origincoord) return;
+                if (!symbol) return;
                 this.canvasContext.font = symbol.fontSymbolSize * 3.3 + "px Arial";
                 this.canvasContext.fillText(groupandtext[1], origincoord.longtitude * this.canvasIndex, origincoord.latitude * this.canvasIndex);
             }
             if (item.type == "ARTCC boundary") {
                 const artcc = ReadSctARTCC(this.sectorCache.ARTCCs, item.name);
                 const symbol = ReadSymbol(this.symbolCache.colors, item.type, "line");
-                if (symbol == undefined || artcc == undefined) return;
+                if (!symbol || !artcc) return;
                 this.canvasContext.lineWidth = symbol.lineWeight;
                 this.canvasContext.strokeStyle = symbol.color;
                 artcc.coords.forEach((coord) => {
@@ -359,7 +357,7 @@ export class Drawer {
                 if (item.type == "Sids") sidstar = ReadSctSidStar(this.sectorCache.sids, item.name);
                 if (item.type == "Stars") sidstar = ReadSctSidStar(this.sectorCache.stars, item.name);
                 const symbol = ReadSymbol(this.symbolCache.colors, item.type, "line");
-                if (sidstar == undefined || symbol == undefined) return;
+                if (!sidstar || !symbol) return;
                 this.canvasContext.lineWidth = symbol.lineWeight;
                 this.canvasContext.strokeStyle = symbol.color;
                 this.canvasContext.setLineDash([5, 5]);
