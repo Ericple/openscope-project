@@ -118,6 +118,13 @@ export interface InetworkConnectionEventMap {
     error: Event;
 }
 
+export const prefixActionMap = {
+    '$': 'reqandres',
+    '#': 'tmandca',
+    '%': 'atcupdate',
+    '@': 'aircraftupdate'
+}
+
 export interface INetworkConnectPacket {
     /**
      * 连接时所用的呼号

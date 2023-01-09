@@ -40,9 +40,9 @@ Afterwards, use `npm run quicks` to start.
 - ***iconv-jschardet*** package for supporting gbk format.
 
 
-- ***Wenlue Zhang*** for pointing out the sucked code for UTC Time Display interval function.
+- ***Wenlue Zhang*** for pointing out the sucked code for UTC Time Display interval function, and his code review helps a lot.
 
-- ***Ian Cowan*** for his free [AviationAPI](https://aviationapi.com/about)
+- ***Ian Cowan*** for his free [AviationAPI](https://aviationapi.com/about).
 
 # FAQ
 

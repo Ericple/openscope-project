@@ -1,4 +1,4 @@
-import CNetworkConnection, { INetworkConnectOption } from "./network";
+import CNetworkConnection, { INetworkConnectOption, prefixActionMap } from "./network";
 
 export class TeleConnection extends CNetworkConnection {
     constructor(options?: INetworkConnectOption) {
@@ -13,26 +13,15 @@ export class TeleConnection extends CNetworkConnection {
      * @returns void
      */
     override _start(): void {
-        if(!this.connected) return;
+        if (!this.connected) return;
         this.client.on('data', (data) => {
             const dataline = data.toString();
-            switch (dataline[0]) {
-                case '$':
-                    this.emitter.emit('reqandres')(null, this.parsePacket(dataline));
-                    break;
-                case '#':
-                    this.emitter.emit('tmandca')(null, this.parsePacket(dataline));
-                    break;
-                case '%':
-                    this.emitter.emit('atcupdate')(null, this.parsePacket(dataline));
-                    break;
-                case '@':
-                    this.emitter.emit('aircraftupdate')(null, this.parsePacket(dataline));
-                    break;
-                default:
-                    this.emitter.emit('error')(new Error('cannot read the prefix of dataline.'));
-                    break;
+            const action = prefixActionMap[dataline[0]];
+            if(!action) {
+                this.emitter.emit('error')(new Error(`Cannot read the prefix of dataline ${dataline}`));
+                return;
             }
-        })
+            this.emitter.emit(action)(null, this.parsePacket(dataline));
+        });
     }
 }
