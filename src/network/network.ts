@@ -118,7 +118,7 @@ export interface InetworkConnectionEventMap {
     error: Event;
 }
 
-export const prefixActionMap = {
+export const fsdPrefixActionMap = {
     '$': 'reqandres',
     '#': 'tmandca',
     '%': 'atcupdate',

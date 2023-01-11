@@ -46,7 +46,7 @@ Afterwards, use `npm run quicks` to start.
 
 # FAQ
 
-<del>- The freetexts are covered by the airport polygon, what should I do?</del> ***(This bug should have been fixed)***
+- <del>The freetexts are covered by the airport polygon, what should I do?</del> ***(This bug should have been fixed)***
   - Please refers to the .asr file your sector loads, open it with the text editor you like, find those lines prefixed with "Regions:", cut all these lines and paste it under "SECTORTITLE:", like the example below：
   ```
     DisplayTypeName:Standard ES radar screen

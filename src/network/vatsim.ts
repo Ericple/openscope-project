@@ -1,4 +1,4 @@
-import CNetworkConnection, { INetworkConnectOption, prefixActionMap } from "./network";
+import CNetworkConnection, { INetworkConnectOption, fsdPrefixActionMap } from "./network";
 /**
  * @class VatsimConnection
  * @description Class to handle packets between client and vatsim
@@ -13,7 +13,7 @@ export class VatsimConnection extends CNetworkConnection {
         if (!this.connected) return;
         this.client.on('data', (data) => {
             const dataline = data.toString();
-            const action = prefixActionMap[dataline[0]];
+            const action = fsdPrefixActionMap[dataline[0]];
             if(!action) {
                 this.emitter.emit('error')(new Error(`Cannot read the prefix of dataline ${dataline}`));
                 return;
