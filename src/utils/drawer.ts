@@ -1,6 +1,6 @@
 import { AsrData, EseData, PrfData, SctData } from "../lib/sectortype";
 import elementId from "../lib/elementId";
-import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw, ReadSctAirport, ReadSctVORNDB, ReadSctARTCC, ReadSctSidStar, ReadSctRunway } from "./prfsectorloader";
+import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw, ReadSctAirport, ReadSctVORNDB, ReadSctARTCC, ReadSctSidStar, ReadSctRunway } from "./loader/prfsectorloader";
 import { VoiceData, SymbologyData, ProfileData } from "../lib/settingtype";
 import { LoadSymbologySync, LoadVoiceSync, LoadProfileSync } from "./settingloader";
 import { ipcRenderer } from "electron";

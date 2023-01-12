@@ -1,4 +1,11 @@
-# Openscope 
+<div align=center>
+<img src="src/pages/assets/image/logo.svg">
+</div>
+<center>
+
+# Openscope
+
+
 ![](https://img.shields.io/github/package-json/v/Ericple/openscope-project?style=flat-square)
 ![](https://img.shields.io/github/license/Ericple/openscope-project?logo=github&style=flat-square)
 ![](https://img.shields.io/github/issues/Ericple/openscope-project?style=flat-square)
@@ -9,6 +16,8 @@
 
 ![](https://img.shields.io/github/v/release/Ericple/openscope-project?include_prereleases&style=for-the-badge)![](https://img.shields.io/github/downloads/Ericple/openscope-project/total?style=for-the-badge) 
 # [Download](https://github.com/Ericple/openscope-project/releases/latest) 
+
+</center>
 
 # Screenshots
 
@@ -33,7 +42,8 @@ For the first start, run:
 npm i && npm run start
 ```
 
-Afterwards, use `npm run quicks` to start.
+Afterwards, upon each debugging, if you did not edit any file in /pages or /config, use `npm run quicks` to skip the asset copying process. Otherwise, you still need
+to use `npm run start` to start debugging.
 
 # Thanks to
 
@@ -42,7 +52,7 @@ Afterwards, use `npm run quicks` to start.
 
 - ***Wenlue Zhang*** for pointing out the sucked code for UTC Time Display interval function, and his code review helps a lot.
 
-- ***Ian Cowan*** for his free [AviationAPI](https://aviationapi.com/about).
+- ***Ian Cowan*** for his [AviationAPI](https://aviationapi.com/about).
 
 # FAQ
 

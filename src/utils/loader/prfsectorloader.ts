@@ -1,9 +1,9 @@
 import fs from "fs";
 import * as jschardet from "iconv-jschardet";
-import { parse2CoordB } from "../lib/coordparser";
-import { Coordinate_B, EseFreetext, SctAirport, SctARTCC, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SctRunway, SctSIDSTAR, SctVorNdb, SymbologyDefine } from "../lib/datatype";
-import * as sectortype from "../lib/sectortype";
-import spaceformatter from "../lib/spaceformatter";
+import { parse2CoordB } from "../../lib/coordparser";
+import { Coordinate_B, EseFreetext, SctAirport, SctARTCC, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SctRunway, SctSIDSTAR, SctVorNdb, SymbologyDefine } from "../../lib/datatype";
+import * as sectortype from "../../lib/sectortype";
+import spaceformatter from "../../lib/spaceformatter";
 
 /**
  * 读取并处理Prf配置文件

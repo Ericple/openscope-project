@@ -1,0 +1,27 @@
+{
+    "import": 
+    [
+        "./ZBBB_AWY_2.awy"
+    ],
+    "config": 
+    {
+        "coord": "precise"
+    },
+    "Routes": 
+    [
+        {
+            "Name": "A591",
+            "Points": [
+                [1,2.23],
+                [3,4]
+            ]
+        },
+        {
+            "Name": "A592",
+            "Points": [
+                [1,2],
+                [3,4]
+            ]
+        }
+    ]
+}

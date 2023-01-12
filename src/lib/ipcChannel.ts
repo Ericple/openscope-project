@@ -15,7 +15,8 @@ export const ipcChannel = {
         },
         msg: {
             error: "app.errmsg",
-            warning: "app.wrnmsg"
+            warning: "app.wrnmsg",
+            info: "app.info"
         },
         func: {
             connectToNetwork: "app.func.connecttonetwork",

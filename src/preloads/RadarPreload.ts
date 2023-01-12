@@ -15,7 +15,7 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
     const themebtn = document.getElementById(elementId.RadarWindow.Appbar.Buttons.theme);
     const msgbox = document.querySelectorAll('input')[0];
     const metarContainer = document.getElementById(elementId.RadarWindow.Appbar.Container.metar);
-    function defaultKeyDown(e:KeyboardEvent){
+    function defaultKeyDown(e: KeyboardEvent){
         if(msgbox == null) return;
         if(e.code == 'F2') {
             msgbox.value = '.QD ';
@@ -103,12 +103,8 @@ contextBridge.exposeInMainWorld('initApp', (rootElement: string) => {
                 tag.id = apt + 'metar';
                 tag.innerText = `${apt} - Fetching...`;
                 const existtag = document.getElementById(apt+'metar');
-                if(existtag == null) {
-                    metarContainer?.appendChild(tag);
-                }else{
-                    metarContainer?.removeChild(existtag);
-                    metarContainer?.appendChild(tag);
-                }
+                if(existtag !== null) metarContainer?.removeChild(existtag);
+                metarContainer?.appendChild(tag);
             });
             ipcRenderer.invoke(ipcChannel.app.func.fetchWeather, apts);
         }

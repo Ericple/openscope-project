@@ -17,7 +17,8 @@ function CreateRadarWindow() {
         minHeight: 1000,//最小高度1000
         frame: false,//无边框窗口
         webPreferences: {
-            preload: path.join(__dirname, "preloads", "RadarPreload.js")
+            preload: path.join(__dirname, "preloads", "RadarPreload.js"),
+            nodeIntegrationInWorker: true
         }
     });
     Electron.app.setName("OpenScope");
@@ -90,15 +91,26 @@ Electron.ipcMain.handle(ipcChannel.app.window.minimize, () => {
 });
 
 Electron.ipcMain.handle(ipcChannel.app.msg.error, (e, args) => {
-    Electron.dialog.showErrorBox(args.title, args.content);
+    const result = Electron.dialog.showErrorBox(args.title, args.message);
+    e.sender.send(ipcChannel.app.msg.error, result);
 });
 
 Electron.ipcMain.handle(ipcChannel.app.msg.warning, (e, args) => {
-    Electron.dialog.showMessageBox(RadarWindow, {
+    const result = Electron.dialog.showMessageBox(RadarWindow, {
         type: "warning",
         title: args.title,
         message: args.message,
     });
+    e.sender.send(ipcChannel.app.msg.warning, result);
+});
+
+Electron.ipcMain.handle(ipcChannel.app.msg.info, (e, args) => {
+    const result = Electron.dialog.showMessageBox(RadarWindow, {
+        type: "info",
+        title: args.title,
+        message: args.message,
+    });
+    e.sender.send(ipcChannel.app.msg.info, result);
 });
 
 Electron.ipcMain.handle(ipcChannel.app.func.connectToNetwork, () => {
