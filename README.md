@@ -1,6 +1,6 @@
 <p align=center>
   <a href="https://openvmsys.cn/openscope">
-    <img alt="openscope" src="src/pages/assets/image/logo.svg">
+    <img alt="openscope" src="https://openvmsys.cn/openscope/img/logo.svg">
   </a>
 </p>
 
@@ -26,9 +26,9 @@ A cross platform ATC terminal
 
 # Screenshots
 
-![](src/pages/assets/image/Openscope5.png)
-![](src/pages/assets/image/Openscope1.png)
-![](src/pages/assets/image/Openscope2.png)
+![](https://openvmsys.cn/openscope/img/Openscope5.png)
+![](https://openvmsys.cn/openscope/img/Openscope1.png)
+![](https://openvmsys.cn/openscope/img/Openscope2.png)
 
 
 # Contributing
