@@ -21,7 +21,7 @@ A cross platform ATC terminal
 <p align=center>
 <img src="https://img.shields.io/github/v/release/Ericple/openscope-project?include_prereleases&style=for-the-badge">
 <img src="https://img.shields.io/github/downloads/Ericple/openscope-project/total?style=for-the-badge"><br>
-<button onclick="window.location=https://github.com/Ericple/openscope-project/releases/latest" style="position: relative;width:120px;height:40px;border-radius:6px;background-color:rgb(0, 119, 255);color:white;border:none;font-size:16px;margin:auto;cursor:pointer;">Download</button>
+<a href="https://github.com/Ericple/openscope-project/releases/latest" style="position: relative;width:120px;height:40px;border-radius:6px;background-color:rgb(0, 119, 255);color:white;border:none;font-size:16px;top:16px;cursor:pointer;padding:8px 16px 8px 16px">Download</a>
 </p>
 
 # Screenshots
