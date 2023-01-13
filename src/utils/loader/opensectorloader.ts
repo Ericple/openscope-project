@@ -3,14 +3,12 @@ import fs from 'fs';
 import { ErrorBox } from "../../lib/popupMsger";
 import path from 'path';
 export class OpenSectorLoader extends CSectorLoader {
+    cache: JSON[] = [];
     constructor(path: string) {
         super();
         this.rootpath = path;
     }
-    // public Load() {
-        
-    // }
-    public ReadEntry(){
+    public Read(){
         if (!fs.existsSync(this.rootpath) || path.extname(this.rootpath) !== '.json') {
             ErrorBox({
                 title: "错误",
