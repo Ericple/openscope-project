@@ -1,9 +1,9 @@
 import fs from "fs";
 import * as jschardet from "iconv-jschardet";
-import { parse2CoordB } from "../../lib/coordparser";
-import { Coordinate_B, EseFreetext, SctAirport, SctARTCC, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SctRunway, SctSIDSTAR, SctVorNdb, SymbologyDefine } from "../../lib/datatype";
-import * as sectortype from "../../lib/sectortype";
-import spaceformatter from "../../lib/spaceformatter";
+import { parse2CoordB_ } from "../lib/coordparser";
+import { Coordinate_B, EseFreetext, SctAirport, SctARTCC, SctDefinition, SctFix, SctGEO, SctLoHiAirway, SctREGIONS, SctRunway, SctSIDSTAR, SctVorNdb, SymbologyDefine } from "../lib/datatype";
+import * as sectortype from "../lib/sectortype";
+import spaceformatter from "../lib/spaceformatter";
 
 /**
  * 读取并处理Prf配置文件
@@ -89,11 +89,11 @@ export function LoadAsrFile(path: string, callback: (err: NodeJS.ErrnoException 
                         break;
                     case 5:
                         result.windowArea = {
-                            coord1: parse2CoordB({
+                            coord1: parse2CoordB_({
                                 latitude: items[1],
                                 longitude: items[2]
                             }),
-                            coord2: parse2CoordB({
+                            coord2: parse2CoordB_({
                                 latitude: items[3],
                                 longitude: items[4]
                             })
@@ -139,11 +139,11 @@ export function LoadAsrFileSync(path: string): sectortype.AsrData {
                     break;
                 case 5:
                     result.windowArea = {
-                        coord1: parse2CoordB({
+                        coord1: parse2CoordB_({
                             latitude: items[1],
                             longitude: items[2]
                         }),
-                        coord2: parse2CoordB({
+                        coord2: parse2CoordB_({
                             latitude: items[1],
                             longitude: items[2]
                         })
@@ -199,7 +199,7 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     result.vors.push({
                         name: dataline[0],
                         frequency: dataline[1],
-                        coord: parse2CoordB({
+                        coord: parse2CoordB_({
                             latitude: dataline[2],
                             longitude: dataline[3]
                         }),
@@ -229,7 +229,7 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     result.ndbs.push({
                         name: dataline[0],
                         frequency: dataline[1],
-                        coord: parse2CoordB({
+                        coord: parse2CoordB_({
                             latitude: dataline[2],
                             longitude: dataline[3]
                         }),
@@ -259,7 +259,7 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     result.airports.push({
                         icao: dataline[0],
                         frequency: dataline[1],
-                        coord: parse2CoordB({
+                        coord: parse2CoordB_({
                             latitude: dataline[2],
                             longitude: dataline[3]
                         }),
@@ -292,11 +292,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         endPointB: dataline[1],
                         HeadingA: parseInt(dataline[2]),
                         HeadingB: parseInt(dataline[3]),
-                        coordA: parse2CoordB({
+                        coordA: parse2CoordB_({
                             latitude: dataline[4],
                             longitude: dataline[5]
                         }),
-                        coordB: parse2CoordB({
+                        coordB: parse2CoordB_({
                             latitude: dataline[6],
                             longitude: dataline[7]
                         }),
@@ -327,7 +327,7 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     if (dataline.length !== 3) return;
                     result.fixes.push({
                         name: dataline[0],
-                        coord: parse2CoordB({
+                        coord: parse2CoordB_({
                             latitude: dataline[1],
                             longitude: dataline[2]
                         }),
@@ -364,11 +364,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         result.ARTCCs.push({
                             group: group,
                             coords: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[linelen - 4],
                                     longitude: dataline[linelen - 3]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[linelen - 2],
                                     longitude: dataline[linelen - 1]
                                 }),
@@ -378,11 +378,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     else {
                         if (group == result.ARTCCs[result.ARTCCs.length - 1].group) {
                             result.ARTCCs[result.ARTCCs.length - 1].coords.push({
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[linelen - 4],
                                     longitude: dataline[linelen - 3]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[linelen - 2],
                                     longitude: dataline[linelen - 1]
                                 }),
@@ -392,11 +392,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                             result.ARTCCs.push({
                                 group: group,
                                 coords: [{
-                                    coordA: parse2CoordB({
+                                    coordA: parse2CoordB_({
                                         latitude: dataline[linelen - 4],
                                         longitude: dataline[linelen - 3]
                                     }),
-                                    coordB: parse2CoordB({
+                                    coordB: parse2CoordB_({
                                         latitude: dataline[linelen - 2],
                                         longitude: dataline[linelen - 1]
                                     })
@@ -428,11 +428,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         result.sids.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -441,11 +441,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     }
                     else {
                         result.sids[result.sids.length - 1].coords.push({
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[0],
                                 longitude: dataline[1]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[2],
                                 longitude: dataline[3]
                             })
@@ -475,11 +475,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         result.stars.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -488,11 +488,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     }
                     else {
                         result.stars[result.stars.length - 1].coords.push({
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[0],
                                 longitude: dataline[1]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[2],
                                 longitude: dataline[3]
                             })
@@ -521,11 +521,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         result.loAirways.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -535,11 +535,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     else {
                         if (dataline[0] == result.loAirways[result.loAirways.length - 1].group) {
                             result.loAirways[result.loAirways.length - 1].coords.push({
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -569,11 +569,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         result.hiAirways.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -583,11 +583,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     else {
                         if (dataline[0] == result.hiAirways[result.hiAirways.length - 1].group) {
                             result.hiAirways[result.hiAirways.length - 1].coords.push({
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -617,11 +617,11 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                         result.GEOs.push({
                             group: dataline[0],
                             items: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -631,13 +631,13 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     }
                     else {
                         result.GEOs[result.GEOs.length - 1].items.push({
-                            coordA: parse2CoordB(
+                            coordA: parse2CoordB_(
                                 {
                                     latitude: dataline[0],
                                     longitude: dataline[1]
                                 }
                             ),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[2],
                                 longitude: dataline[3]
                             }),
@@ -668,7 +668,7 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                             regionName: dataline[0],
                             items: [{
                                 colorFlag: dataline[1],
-                                coords: [parse2CoordB({
+                                coords: [parse2CoordB_({
                                     latitude: dataline[2], longitude: dataline[3]
                                 })]
                             }],
@@ -677,7 +677,7 @@ export function LoadSctFile(path: string, callback: (err: NodeJS.ErrnoException 
                     else {
                         result.REGIONs[result.REGIONs.length - 1].items.push({
                             colorFlag: result.REGIONs[result.REGIONs.length - 1].items[result.REGIONs[result.REGIONs.length - 1].items.length - 1].colorFlag,
-                            coords: [parse2CoordB({
+                            coords: [parse2CoordB_({
                                 latitude: dataline[0], longitude: dataline[1]
                             })]
                         });
@@ -733,7 +733,7 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 result.vors.push({
                     name: dataline[0],
                     frequency: dataline[1],
-                    coord: parse2CoordB({
+                    coord: parse2CoordB_({
                         latitude: dataline[2],
                         longitude: dataline[3]
                     }),
@@ -764,7 +764,7 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 result.ndbs.push({
                     name: dataline[0],
                     frequency: dataline[1],
-                    coord: parse2CoordB({
+                    coord: parse2CoordB_({
                         latitude: dataline[2],
                         longitude: dataline[3]
                     }),
@@ -795,7 +795,7 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 result.airports.push({
                     icao: dataline[0],
                     frequency: dataline[1],
-                    coord: parse2CoordB({
+                    coord: parse2CoordB_({
                         latitude: dataline[2],
                         longitude: dataline[3]
                     }),
@@ -828,11 +828,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                     endPointB: dataline[1],
                     HeadingA: parseInt(dataline[2]),
                     HeadingB: parseInt(dataline[3]),
-                    coordA: parse2CoordB({
+                    coordA: parse2CoordB_({
                         latitude: dataline[4],
                         longitude: dataline[5]
                     }),
-                    coordB: parse2CoordB({
+                    coordB: parse2CoordB_({
                         latitude: dataline[6],
                         longitude: dataline[7]
                     }),
@@ -863,7 +863,7 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 if (dataline.length !== 3) return;
                 result.fixes.push({
                     name: dataline[0],
-                    coord: parse2CoordB({
+                    coord: parse2CoordB_({
                         latitude: dataline[1],
                         longitude: dataline[2]
                     }),
@@ -900,11 +900,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                     result.ARTCCs.push({
                         group: group,
                         coords: [{
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[linelen - 4],
                                 longitude: dataline[linelen - 3]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[linelen - 2],
                                 longitude: dataline[linelen - 1]
                             })
@@ -914,11 +914,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 else {
                     if (group == result.ARTCCs[result.ARTCCs.length - 1].group) {
                         result.ARTCCs[result.ARTCCs.length - 1].coords.push({
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[linelen - 4],
                                 longitude: dataline[linelen - 3]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[linelen - 2],
                                 longitude: dataline[linelen - 1]
                             })
@@ -928,11 +928,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                         result.ARTCCs.push({
                             group: group,
                             coords: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[linelen - 4],
                                     longitude: dataline[linelen - 3]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[linelen - 2],
                                     longitude: dataline[linelen - 1]
                                 })
@@ -964,11 +964,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                     result.sids.push({
                         group: dataline[0],
                         coords: [{
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
                             }),
@@ -977,11 +977,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 }
                 else {
                     result.sids[result.sids.length - 1].coords.push({
-                        coordA: parse2CoordB({
+                        coordA: parse2CoordB_({
                             latitude: dataline[0],
                             longitude: dataline[1]
                         }),
-                        coordB: parse2CoordB({
+                        coordB: parse2CoordB_({
                             latitude: dataline[2],
                             longitude: dataline[3]
                         })
@@ -1011,11 +1011,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                     result.stars.push({
                         group: dataline[0],
                         coords: [{
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
                             }),
@@ -1024,11 +1024,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 }
                 else {
                     result.stars[result.stars.length - 1].coords.push({
-                        coordA: parse2CoordB({
+                        coordA: parse2CoordB_({
                             latitude: dataline[0],
                             longitude: dataline[1]
                         }),
-                        coordB: parse2CoordB({
+                        coordB: parse2CoordB_({
                             latitude: dataline[2],
                             longitude: dataline[3]
                         })
@@ -1057,11 +1057,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                     result.loAirways.push({
                         group: dataline[0],
                         coords: [{
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
                             }),
@@ -1071,11 +1071,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 else {
                     if (dataline[0] == result.loAirways[result.loAirways.length - 1].group) {
                         result.loAirways[result.loAirways.length - 1].coords.push({
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
                             }),
@@ -1085,11 +1085,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                         result.loAirways.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -1120,11 +1120,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                     result.hiAirways.push({
                         group: dataline[0],
                         coords: [{
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
                             }),
@@ -1134,11 +1134,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 else {
                     if (dataline[0] == result.hiAirways[result.hiAirways.length - 1].group) {
                         result.hiAirways[result.hiAirways.length - 1].coords.push({
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
                             }),
@@ -1148,11 +1148,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                         result.hiAirways.push({
                             group: dataline[0],
                             coords: [{
-                                coordA: parse2CoordB({
+                                coordA: parse2CoordB_({
                                     latitude: dataline[1],
                                     longitude: dataline[2]
                                 }),
-                                coordB: parse2CoordB({
+                                coordB: parse2CoordB_({
                                     latitude: dataline[3],
                                     longitude: dataline[4]
                                 }),
@@ -1183,11 +1183,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                     result.GEOs.push({
                         group: dataline[0],
                         items: [{
-                            coordA: parse2CoordB({
+                            coordA: parse2CoordB_({
                                 latitude: dataline[1],
                                 longitude: dataline[2]
                             }),
-                            coordB: parse2CoordB({
+                            coordB: parse2CoordB_({
                                 latitude: dataline[3],
                                 longitude: dataline[4]
                             }),
@@ -1197,11 +1197,11 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 }
                 else {
                     result.GEOs[result.GEOs.length - 1].items.push({
-                        coordA: parse2CoordB({
+                        coordA: parse2CoordB_({
                             latitude: dataline[0],
                             longitude: dataline[1]
                         }),
-                        coordB: parse2CoordB({
+                        coordB: parse2CoordB_({
                             latitude: dataline[2],
                             longitude: dataline[3]
                         }),
@@ -1237,14 +1237,14 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                 if(dataline.length == 3){
                     result.REGIONs[result.REGIONs.length - 1].items.push({
                         colorFlag: dataline[0],
-                        coords: [parse2CoordB({
+                        coords: [parse2CoordB_({
                             latitude: dataline[1], longitude: dataline[2]
                         })]
                     });
                     return;
                 }
                 if(dataline.length == 2){
-                    result.REGIONs[result.REGIONs.length - 1].items[result.REGIONs[result.REGIONs.length - 1].items.length - 1].coords.push(parse2CoordB(
+                    result.REGIONs[result.REGIONs.length - 1].items[result.REGIONs[result.REGIONs.length - 1].items.length - 1].coords.push(parse2CoordB_(
                         {
                             latitude: dataline[0],
                             longitude: dataline[1]
@@ -1260,7 +1260,7 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                             regionName: dataline[0],
                             items: [{
                                 colorFlag: dataline[1],
-                                coords: [parse2CoordB({
+                                coords: [parse2CoordB_({
                                     latitude: dataline[2], longitude: dataline[3]
                                 })]
                             }],
@@ -1270,7 +1270,7 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                         if (dataline[0] == result.REGIONs[result.REGIONs.length - 1].regionName) {
                             result.REGIONs[result.REGIONs.length - 1].items.push({
                                 colorFlag: dataline[1],
-                                coords: [parse2CoordB({
+                                coords: [parse2CoordB_({
                                     latitude: dataline[2], longitude: dataline[3]
                                 })]
                             });
@@ -1280,7 +1280,7 @@ export function LoadSctFileSync(path: string): sectortype.SctData {
                                 regionName: dataline[0],
                                 items: [{
                                     colorFlag: dataline[1],
-                                    coords: [parse2CoordB({
+                                    coords: [parse2CoordB_({
                                         latitude: dataline[2], longitude: dataline[3]
                                     })]
                                 }],
@@ -1343,7 +1343,7 @@ export function LoadEseFile(path: string, callback: (err: NodeJS.ErrnoException 
                         });
                     }
                     else if (dataline[0] == "COORD") {
-                        result.airspacces[result.airspacces.length - 1].coords.push(parse2CoordB({
+                        result.airspacces[result.airspacces.length - 1].coords.push(parse2CoordB_({
                             latitude: dataline[1],
                             longitude: dataline[2]
                         }));
@@ -1392,7 +1392,7 @@ export function LoadEseFile(path: string, callback: (err: NodeJS.ErrnoException 
                     //读取
                     const dataline = line.split(":");
                     result.freetexts.push({
-                        coord: parse2CoordB({
+                        coord: parse2CoordB_({
                             latitude: dataline[0],
                             longitude: dataline[1]
                         }),
@@ -1513,7 +1513,7 @@ export function LoadEseFileSync(path: string): sectortype.EseData {
                     });
                 }
                 else if (dataline[0] == "COORD") {
-                    result.airspacces[result.airspacces.length - 1].coords.push(parse2CoordB({
+                    result.airspacces[result.airspacces.length - 1].coords.push(parse2CoordB_({
                         latitude: dataline[1],
                         longitude: dataline[2]
                     }));
@@ -1562,7 +1562,7 @@ export function LoadEseFileSync(path: string): sectortype.EseData {
                 //读取
                 const dataline = line.split(":");
                 result.freetexts.push({
-                    coord: parse2CoordB({
+                    coord: parse2CoordB_({
                         latitude: dataline[0],
                         longitude: dataline[1]
                     }),

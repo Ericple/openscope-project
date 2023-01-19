@@ -1,14 +1,41 @@
 {
   "name": "openscope-project",
-  "version": "0.3.0",
-  "description": "open source successor of euroscope power of control",
-  "main": "./dist/main.js",
+  "version": "0.4.0",
+  "private": true,
   "scripts": {
-    "test": "npx electron ./dist/main.js",
-    "compile": "npx tsc",
-    "updateassets": "npx ts-node CopyAssets.ts",
-    "start": "npm run compile && npm run updateassets && npm run test",
-    "quicks": "tsc && electron ./dist/main.js"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "tsc && vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.32",
+    "ant-design-vue": "^3.2.15",
+    "iconv-jschardet": "^2.0.32",
+    "jquery": "^3.6.3",
+    "typings": "^2.1.1",
+    "vue": "^3.2.13"
+  },
+  "devDependencies": {
+    "@types/electron-devtools-installer": "^2.2.0",
+    "@types/jquery": "^3.5.16",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-plugin-typescript": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "@vue/eslint-config-typescript": "^9.1.0",
+    "electron": "^19.1.9",
+    "electron-devtools-installer": "^3.1.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "ts-loader": "~8.2.0",
+    "typescript": "~4.5.5",
+    "vue-cli-plugin-electron-builder": "~2.1.1",
+    "worker-loader": "^3.0.8"
   },
   "repository": {
     "type": "git",
@@ -24,20 +51,5 @@
   "bugs": {
     "url": "https://github.com/OpenVMSys/openscope-project/issues"
   },
-  "homepage": "https://github.com/OpenVMSys/openscope-project#readme",
-  "devDependencies": {
-    "@types/shelljs": "^0.8.11",
-    "@typescript-eslint/eslint-plugin": "^5.48.0",
-    "@typescript-eslint/parser": "^5.48.0",
-    "eslint": "^8.31.0",
-    "shelljs": "^0.8.5",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "electron": "^19.1.9",
-    "iconv-jschardet": "^2.0.32"
-  }
+  "homepage": "https://github.com/OpenVMSys/openscope-project#readme"
 }

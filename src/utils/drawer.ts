@@ -1,6 +1,6 @@
 import { AsrData, EseData, PrfData, SctData } from "../lib/sectortype";
 import elementId from "../lib/elementId";
-import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw, ReadSctAirport, ReadSctVORNDB, ReadSctARTCC, ReadSctSidStar, ReadSctRunway } from "./loader/prfsectorloader";
+import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw, ReadSctAirport, ReadSctVORNDB, ReadSctARTCC, ReadSctSidStar, ReadSctRunway } from "./prfsectorloader";
 import { VoiceData, SymbologyData, ProfileData } from "../lib/settingtype";
 import { LoadSymbologySync, LoadVoiceSync, LoadProfileSync } from "./settingloader";
 import { ipcRenderer } from "electron";
@@ -8,7 +8,7 @@ import ipcChannel from "../lib/ipcChannel";
 import path from 'path';
 import { SctSIDSTAR, SctVorNdb } from "../lib/datatype";
 import fs from 'fs';
-import { DefaultSectorSettingFilePath } from "../global";
+import { DefaultSectorSettingFilePath } from "../lib/global";
 
 const SCROLL_INDEX = 1.2;
 const AP_FREETEXT_LIMIT = 20000;//要显示机场FREETEXT的最小缩放倍数
@@ -57,7 +57,7 @@ export class Drawer {
         });
     }
     public ClearCanvas(): void {
-        this.canvas.height = window.innerHeight - 136;
+        this.canvas.height = window.innerHeight;
         this.canvas.width = window.innerWidth;
         this.Draw();
     }

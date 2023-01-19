@@ -27,7 +27,7 @@ export const elementId = {
             }
         },
         Canvas: {
-            screen: "app"
+            screen: "radar"
         },
         Footer: {
             channelChooser: "footer-channel-chooser",
@@ -35,6 +35,9 @@ export const elementId = {
             toolbar: {
                 messagebox: "tool-bar-messagebox"
             }
+        },
+        SubWin: {
+            metar: "metarList"
         }
     }
 }

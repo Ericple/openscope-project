@@ -13,7 +13,7 @@ export function parse2CoordA(coord: Coordinate_B): Coordinate_A {
  * @param coord A类坐标
  * @returns B类直角绘制坐标
  */
-export function parse2CoordB(coord: Coordinate_A): Coordinate_B {
+export function parse2CoordB_(coord: Coordinate_A): Coordinate_B {
     let latres;
     let lonres;
     try {
@@ -40,6 +40,15 @@ export function parse2CoordB(coord: Coordinate_A): Coordinate_B {
         throw error;
     }
 }
+export function parse2CoordB(coord: Coordinate_A){
+    let latres = parseFloat(coord.latitude.substring(1, coord.latitude.length));
+    const lonres = parseFloat(coord.longitude.substring(1,coord.longitude.length));
+    if(coord.latitude.startsWith("N")) latres = -latres;
+    return {
+        latitude: latres,
+        longtitude: lonres
+    }
+}
 /**
  * 将B类坐标转换为极坐标
  * @param coord B类坐标
@@ -52,10 +61,15 @@ export function parse2PolarCoord(coord: Coordinate_B): PolarCoordinate {
     }
 }
 
+export const parserMap = {
+    'obscure': parse2CoordB_,
+    'precise': parse2CoordB
+}
+
 /**
  * 实现坐标与坐标的转换
  * 内置坐标类型： `Coordinate_A` `Coordinate_B` `PolarCoordinate`
  */
 export default {
-    parse2CoordA, parse2CoordB, parse2PolarCoord
+    parse2CoordA, parse2CoordB_, parse2PolarCoord, parse2CoordB
 }

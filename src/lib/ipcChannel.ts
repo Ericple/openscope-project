@@ -11,7 +11,9 @@ export const ipcChannel = {
         update: {
             prfFile: "app.update.prfFile",
             theme: "app.toggle.theme",
-            themeSystem: "app.toggle.theme.system"
+            themeSystem: "app.toggle.theme.system",
+            canvasIndex: "app.update.canvas.index",
+            canvasPos: "app.update.canvas.pos"
         },
         msg: {
             error: "app.errmsg",
@@ -20,7 +22,8 @@ export const ipcChannel = {
         },
         func: {
             connectToNetwork: "app.func.connecttonetwork",
-            fetchWeather: "app.func.fetchweather"
+            fetchWeather: "app.func.fetchweather",
+            initRadar: "app.func.initradar"
         }
     }
 }
