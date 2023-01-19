@@ -5,6 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import path from 'path'
 import ipcChannel from './lib/ipcChannel'
 import { METAR_URL } from './lib/global'
+import https from 'https'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Scheme must be registered before the app is ready
@@ -46,14 +47,12 @@ async function createWindow() {
   ipcMain.handle(ipcChannel.app.update.prfFile, () => {
     SelectSector();
   })
-  ipcMain.on(ipcChannel.app.func.fetchWeather, (e, args: string) => {
-    import('https').then((https) => {
-      https.get(METAR_URL + args, (res) => {
-        res.on('data', (chunk: Buffer) => {
-          win.webContents.send(ipcChannel.app.func.fetchWeather, chunk.toString())
-        })
-      });
-    })
+  ipcMain.handle(ipcChannel.app.func.fetchWeather, (e, args: string) => {
+    https.get(METAR_URL + args, (res) => {
+      res.on('data', (chunk: Buffer) => {
+        win.webContents.send(ipcChannel.app.func.fetchWeather, chunk.toString())
+      })
+    });
   });
   function SelectSector() {
     dialog.showOpenDialog(win, {

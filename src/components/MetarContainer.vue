@@ -4,7 +4,7 @@
             Weather Information
         </div>
         <div class="content">
-            <a-input-search id="searchbox" placeholder="Search for Wx information" @search="searchWx" v-model:value="searchValue" :disabled="isSearching"/>
+            <a-input-search id="searchbox" placeholder="Search for Wx information" @search="searchWx" v-model:value="searchValue" :loading="isSearching"/>
         </div>
         <div class="content">
             <a-collapse v-model:activeKey="activeKey" :bordered="false" id="metarList">
@@ -25,9 +25,9 @@ export default defineComponent({
         return {
             show: true,
             activeKey: ref(['1']),
-            wXAirports: (window as any).weather.weatherData,
+            wXAirports: (window as any).weather.weatherData(),
             searchValue: '',
-            isSearching: false
+            isSearching: (window as any).weather.searchStatus()
         }
     },
     methods: {
@@ -67,16 +67,13 @@ export default defineComponent({
             }
         },
         searchWx() {
-            this.isSearching=true;
             (window as any).weather.requestWx(this.searchValue);
-            setTimeout(() => {
-                this.isSearching=false
-            }, 2500);
         },
     },
     mounted: function(){
         setInterval(() => {
             this.wXAirports = (window as any).weather.weatherData()
+            this.isSearching = (window as any).weather.searchStatus()
         },3000)
     }
 })

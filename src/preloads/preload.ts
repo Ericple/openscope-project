@@ -30,30 +30,35 @@ contextBridge.exposeInMainWorld('radar', {
         };
     }
 })
+let isSearchingWx = false
+ipcRenderer.on(ipcChannel.app.func.fetchWeather, (e, arg) => {
+    isSearchingWx = false
+    const metars: string[] = arg.split('\n')
+    metars.forEach(metar => {
+        const icao = metar.substring(0, 4)
+        let exist = false
+        for (let index = 0; index < weatherData.length; index++) {
+            const weather = weatherData[index];
+            if (weather.icao == icao && weather.metar !== metar) {
+                weather.metar = metar
+                weather.updateTime = getTime()
+                exist = true
+            }
+        }
+        if (!exist) weatherData.push({ icao: icao, updateTime: getTime(), metar: metar })
+    })
+})
 const weatherData: { icao: string, metar: string, updateTime: string }[] = []
 contextBridge.exposeInMainWorld('weather', {
     requestWx: (icaos: string) => {
-        ipcRenderer.send(ipcChannel.app.func.fetchWeather, icaos)
-        ipcRenderer.on(ipcChannel.app.func.fetchWeather, (e, arg) => {
-            const metars: string[] = arg.split('\n')
-            metars.forEach(metar => {
-                const icao = metar.substring(0, 4)
-                for (let index = 0; index <= weatherData.length; index++) {
-                    if (index < weatherData.length) {
-                        const weather = weatherData[index];
-                        if (weather.icao == icao && weather.metar !== metar) {
-                            weather.metar = metar
-                            weather.updateTime = getTime()
-                        }
-                    } else {
-                        weatherData.push({ icao: icao, updateTime: getTime(), metar: metar })
-                    }
-                }
-            })
-        })
+        isSearchingWx = true
+        ipcRenderer.invoke(ipcChannel.app.func.fetchWeather, icaos)
     },
     weatherData: () => {
         return weatherData
+    },
+    searchStatus: () => {
+        return isSearchingWx
     }
 })
 const aircraftData: {
@@ -95,28 +100,28 @@ const aircraftData: {
             key: '1',
             aircrafts: [
                 {
-                    'C/S':'CALLSIGN',
-                    'TYPE':'TYPE',
-                    'C':'CLEARANCE',
-                    'D':'UNKNOWN',
-                    'STS':'STATUS',
-                    'R':'UNKNOWN',
-                    'DEP':'A',
-                    'ARR':'B',
-                    'RWY':'C',
-                    'SIE':'SIE',
+                    'C/S': 'CALLSIGN',
+                    'TYPE': 'TYPE',
+                    'C': 'CLEARANCE',
+                    'D': 'UNKNOWN',
+                    'STS': 'STATUS',
+                    'R': 'UNKNOWN',
+                    'DEP': 'A',
+                    'ARR': 'B',
+                    'RWY': 'C',
+                    'SIE': 'SIE',
                 },
                 {
-                    'C/S':'CALLSIGNB',
-                    'TYPE':'TYPE',
-                    'C':'CLEARANCE',
-                    'D':'UNKNOWN',
-                    'STS':'STATUS',
-                    'R':'UNKNOWN',
-                    'DEP':'A',
-                    'ARR':'B',
-                    'RWY':'C',
-                    'SIE':'SIE',
+                    'C/S': 'CALLSIGNB',
+                    'TYPE': 'TYPE',
+                    'C': 'CLEARANCE',
+                    'D': 'UNKNOWN',
+                    'STS': 'STATUS',
+                    'R': 'UNKNOWN',
+                    'DEP': 'A',
+                    'ARR': 'B',
+                    'RWY': 'C',
+                    'SIE': 'SIE',
                 }
             ]
         }, {
@@ -124,11 +129,11 @@ const aircraftData: {
             key: '2',
             cols: [
                 "RWY", "C/S", "TYPE", "DEP", "ARR", "SIE", "SID",
-                "STE", "STAR", "NXT", "EXT","COPN", "CRZ", "ASSR"
+                "STE", "STAR", "NXT", "EXT", "COPN", "CRZ", "ASSR"
             ],
             contextMenu: [
-                "RWY", "C/S", "TYPE", "DEP", "ARR", "SIE", "SID",
-                "STE", "STAR", "NXT", "EXT","COPN", "CRZ", "ASSR"
+                "Runway", "C/S", "TYPE", "DEP", "ARR", "SIE", "SID",
+                "STE", "STAR", "NXT", "EXT", "COPN", "CRZ", "ASSR"
             ],
             aircrafts: [
             ]

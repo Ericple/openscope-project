@@ -11,7 +11,7 @@
                             <tr>
                                 <th v-for="col in list.cols" :key="col">{{ col }}</th>
                             </tr>
-                            <a-dropdown :trigger="['click']">
+                            <a-dropdown :trigger="['contextmenu']">
                                 <tr v-for="aircraft in list.aircrafts" :key="aircraft['C/S']">
                                     <td v-for="col in list.cols" :key="col">{{ aircraft[col] }}</td>
                                 </tr>

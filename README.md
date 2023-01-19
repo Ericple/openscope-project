@@ -43,12 +43,9 @@ All contributions are welcomed. Before forking this repository, please consider 
 
 For the first start, run:
 
+```bash
+npm i && npm run electron:serve
 ```
-npm i && npm run start
-```
-
-Afterwards, upon each debugging, if you did not edit any file in /pages or /config, use `npm run quicks` to skip the asset copying process. Otherwise, you still need
-to use `npm run start` to start debugging.
 
 # Thanks to
 
