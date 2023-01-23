@@ -15,7 +15,7 @@ contextBridge.exposeInMainWorld('appbar', {
     openSector: () => ipcRenderer.invoke(ipcChannel.app.update.prfFile)
 })
 const drawerGroup: Drawer[] = [];
-const activeDrawerIndex = 0;
+let activeDrawerIndex = 0;
 contextBridge.exposeInMainWorld('radar', {
     init: function (rootEl: string) {
         const drawer = new Drawer(rootEl)
@@ -48,6 +48,17 @@ contextBridge.exposeInMainWorld('radar', {
             fs.writeFileSync(DefaultSectorSettingFilePath, args.path, 'utf-8')
             drawerGroup[activeDrawerIndex].UpdateCache(args.path);
             drawerGroup[activeDrawerIndex].ClearCanvas();
+        })
+        ipcRenderer.on(ipcChannel.app.func.switchRadarView, (e, args) => {
+            //如果所选视图大于已有
+            while(args+1 > drawerGroup.length){
+                drawerGroup.push(new Drawer('radar'))
+            }
+            drawerGroup.forEach((o) => {
+                o.Hide()
+            })
+            activeDrawerIndex = args
+            drawerGroup[args].Show()
         })
     }
 })

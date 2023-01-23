@@ -67,7 +67,7 @@ export default defineComponent({
             }
         },
         searchWx() {
-            (window as any).weather.requestWx(this.searchValue);
+            (window as any).weather.requestWx(this.searchValue.toUpperCase());
         },
     },
     mounted: function(){

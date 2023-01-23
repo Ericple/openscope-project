@@ -1,12 +1,13 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, Menu, ipcMain, net, dialog } from 'electron'
+import { app, protocol, BrowserWindow, Menu, ipcMain, dialog, globalShortcut, Notification, Tray, nativeImage } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import path from 'path'
 import ipcChannel from './lib/ipcChannel'
 import { METAR_URL, obsAcfDataApi } from './lib/global'
 import https from 'https'
 const isDevelopment = process.env.NODE_ENV !== 'production'
+const appIcon = nativeImage.createFromPath(path.join(__dirname, 'public', 'assets', 'image', 'logo.png'))
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -19,9 +20,10 @@ async function createWindow() {
     minWidth: 1400,
     minHeight: 900,
     frame: false,
+    icon: appIcon,
     webPreferences: {
       preload: path.join(__dirname, 'preloads', 'preload.js')
-    }
+    },
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -54,6 +56,27 @@ async function createWindow() {
       })
     });
   });
+  const switch2R1 = globalShortcut.register('Shift+Q', () => {
+    console.log('switch to radar view 1')
+    win.webContents.send(ipcChannel.app.func.switchRadarView, 0)
+  })
+  const switch2R2 = globalShortcut.register('Shift+W', () => {
+    console.log('switch to radar view 2')
+    win.webContents.send(ipcChannel.app.func.switchRadarView, 1)
+  })
+  const switch2R3 = globalShortcut.register('Shift+E', () => {
+    console.log('switch to radar view 3')
+    win.webContents.send(ipcChannel.app.func.switchRadarView, 2)
+  })
+  const switch2R4 = globalShortcut.register('Shift+R', () => {
+    console.log('switch to radar view 4')
+    win.webContents.send(ipcChannel.app.func.switchRadarView, 3)
+  })
+  if(!switch2R1 || !switch2R2 || !switch2R3 || !switch2R4) new Notification({
+    title: "An error occured",
+    body: "Radar view switcher may not be fully functional",
+    icon: appIcon
+  }).show()
   function SelectSector() {
     dialog.showOpenDialog(win, {
       filters: [{ name: 'prf Config', extensions: ['prf'] }]

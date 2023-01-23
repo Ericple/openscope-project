@@ -24,7 +24,8 @@ export const ipcChannel = {
         func: {
             connectToNetwork: "app.func.connecttonetwork",
             fetchWeather: "app.func.fetchweather",
-            initRadar: "app.func.initradar"
+            initRadar: "app.func.initradar",
+            switchRadarView: "app.func.switchradarview"
         }
     }
 }

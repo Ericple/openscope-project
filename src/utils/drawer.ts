@@ -45,17 +45,12 @@ export class Drawer {
         window.addEventListener('resize', () => {
             this.ClearCanvas();
         });
-        // //处理扇区选择
-        // ipcRenderer.on(ipcChannel.app.update.prfFile, (e, args) => {
-        //     const sectorindicator = document.getElementById(elementId.RadarWindow.Appbar.Tags.currentSector);
-        //     if (sectorindicator !== null) sectorindicator.innerText = path.basename(args.path);
-        //     //更新默认开启扇区
-        //     fs.writeFileSync(DefaultSectorSettingFilePath, args.path, 'utf-8');
-        //     //更新绘制缓存
-        //     this.UpdateCache(args.path);
-        //     //绘制
-        //     this.ClearCanvas();
-        // });
+    }
+    public Hide() {
+        this.canvas.style.display = 'none'
+    }
+    public Show() {
+        this.canvas.style.display = 'block'
     }
     public ClearCanvas(): void {
         this.canvas.height = window.innerHeight;
