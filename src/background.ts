@@ -57,19 +57,15 @@ async function createWindow() {
     });
   });
   const switch2R1 = globalShortcut.register('Shift+Q', () => {
-    console.log('switch to radar view 1')
     win.webContents.send(ipcChannel.app.func.switchRadarView, 0)
   })
   const switch2R2 = globalShortcut.register('Shift+W', () => {
-    console.log('switch to radar view 2')
     win.webContents.send(ipcChannel.app.func.switchRadarView, 1)
   })
   const switch2R3 = globalShortcut.register('Shift+E', () => {
-    console.log('switch to radar view 3')
     win.webContents.send(ipcChannel.app.func.switchRadarView, 2)
   })
   const switch2R4 = globalShortcut.register('Shift+R', () => {
-    console.log('switch to radar view 4')
     win.webContents.send(ipcChannel.app.func.switchRadarView, 3)
   })
   if(!switch2R1 || !switch2R2 || !switch2R3 || !switch2R4) new Notification({

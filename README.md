@@ -58,19 +58,8 @@ npm i && npm run electron:serve
 
 # FAQ
 
-- <del>The freetexts are covered by the airport polygon, what should I do?</del> ***(This bug should have been fixed)***
-  - Please refers to the .asr file your sector loads, open it with the text editor you like, find those lines prefixed with "Regions:", cut all these lines and paste it under "SECTORTITLE:", like the example below：
-  ```
-    DisplayTypeName:Standard ES radar screen
-    DisplayTypeNeedRadarContent:1
-    DisplayTypeGeoReferenced:1
-    SECTORFILE:
-    SECTORTITLE:
-    ;The Regions should be right under the "SECTORTITLE:" line
-    Regions:ZSSS:polygon
-    Regions:ZSPD:polygon
-    ......
-  ```
-
 - How to request metar in openscope?
-  - Just the same as in Euroscope.
+  - Use the 
+
+- How to switch between each sector?
+  - Press Shift+Q/W/E/R to switch from these sector views.
