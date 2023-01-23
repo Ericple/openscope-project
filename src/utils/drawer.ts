@@ -122,7 +122,6 @@ export class Drawer {
         this.canvasPosY = yresult;
         if (!this.coordIndicator) return;
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX}`;
-        // this.ClearCanvas();
     }
     public UpdateCanvasPosXY(x:number,y:number){
         this.canvasPosX += x / this.canvasIndex;

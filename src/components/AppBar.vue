@@ -37,7 +37,7 @@
         </a-tooltip> -->
         <a-tooltip>
             <template #title>Position Indicator</template>
-            <div id="appbar-coordinate"></div>
+            <a class="appbar-menu-item appbar-coordinate" id="appbar-coordinate"></a>
         </a-tooltip>
         <button class="appbar-win-control button-close-app codicon codicon-chrome-close" @click="quitApp"></button>
         <button class="appbar-win-control button-restore-app codicon codicon-chrome-maximize" id="maxBtn"
@@ -147,6 +147,7 @@ a.appbar-menu-item {
     font-size: 12px;
     width: 100px;
     position: relative;
+    display: inline;
     height: 36px;
     margin-right: 6px;
     padding: 0;

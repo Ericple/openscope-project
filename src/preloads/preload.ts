@@ -20,25 +20,18 @@ contextBridge.exposeInMainWorld('radar', {
         screen.addEventListener('wheel', (e) => {
             drawer.UpdateCanvasIndex(e);
         });
-        // let movementX: number;
-        // let movementY: number;
         screen.oncontextmenu = function (ev: MouseEvent) {
             const distX = ev.clientX - screen.offsetLeft;
             const distY = ev.clientY - screen.offsetTop;
             screen.onmousemove = function (e) {
                 const tX= e.clientX - distX;
                 const tY = e.clientY - distY;
-                // movementX = tX;
-                // movementY = tY;
                 screen.style.left = `${tX}px`;
                 screen.style.top = `${tY}px`;
                 drawer.UpdateCanvasPosE(e);
-                // drawer.UpdateCanvasPosE(e);
             }
         };
         screen.onmouseup = function () {
-            // console.log(movement);
-            // drawer.UpdateCanvasPosXY(movement);
             drawer.ClearCanvas();
             screen.style.left = '0px';
             screen.style.top = '45px';
