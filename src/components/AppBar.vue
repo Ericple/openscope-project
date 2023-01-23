@@ -132,10 +132,13 @@ button.button-restore-app {
 
 div.app-bar {
     -webkit-app-region: drag;
+    position: fixed;
     border: none;
     height: 45px;
+    width: 100%;
     padding: 4px;
     box-shadow: 0 9px 28px 8px rgba(0, 0, 0, 0.1);
+    z-index: 99;
 }
 
 a.appbar-menu-item {

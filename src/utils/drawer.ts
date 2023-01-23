@@ -36,6 +36,7 @@ export class Drawer {
         this.canvasContext = this.canvas.getContext('2d');
         this.coordIndicator = document.getElementById(elementId.RadarWindow.Appbar.Tags.currentCoord);
         this.rootElement = document.getElementById(rootElement);
+        this.canvas.id = "radar-drawer";
         this.rootElement?.appendChild(this.canvas);
         this.canvasIndex = 1;
         this.canvasPosX = 0;
@@ -114,14 +115,18 @@ export class Drawer {
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX}`;
         this.ClearCanvas();
     }
-    public UpdateCanvasPosXY(e: MouseEvent): void {
+    public UpdateCanvasPosE(e: MouseEvent): void {
         const xresult = this.canvasPosX + (e.movementX) / this.canvasIndex;
         const yresult = this.canvasPosY + (e.movementY) / this.canvasIndex;
         this.canvasPosX = xresult;
         this.canvasPosY = yresult;
         if (!this.coordIndicator) return;
         this.coordIndicator.innerText = `Lat: ${this.canvasPosY} Lon: ${-this.canvasPosX}`;
-        this.ClearCanvas();
+        // this.ClearCanvas();
+    }
+    public UpdateCanvasPosXY(x:number,y:number){
+        this.canvasPosX += x / this.canvasIndex;
+        this.canvasPosY += y / this.canvasIndex;
     }
     /**
      * 更新绘制缓存
@@ -143,8 +148,12 @@ export class Drawer {
         if (!symbologypath) return;
         symbologypath = path.join(prfPath, "..", AlignPath(symbologypath));
         this.symbolCache = LoadSymbologySync(symbologypath);
+        const ap = document.getElementById('back');
         const backgroundColor = ReadSymbol(this.symbolCache.colors, "Sector", "active sector background")?.color;
-        if (backgroundColor !== undefined) this.canvas.style.backgroundColor = backgroundColor;
+        if (backgroundColor !== undefined) {
+            this.canvas.style.backgroundColor = backgroundColor;
+            if(ap) ap.style.backgroundColor = backgroundColor;
+        }
         let voicepath = ReadPrfData(this.prfCache, "SettingsfileVOICE");
         if (!voicepath) return;
         voicepath = path.join(prfPath, "..", AlignPath(voicepath));
@@ -153,6 +162,9 @@ export class Drawer {
         if (!profilepath) return;
         profilepath = path.join(prfPath, "..", AlignPath(profilepath));
         this.profileCache = LoadProfileSync(profilepath);
+    }
+    public UpdateAcfCache(): void {
+        return
     }
     public Draw(): void {
         if (!this.canvasContext) return;

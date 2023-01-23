@@ -11,23 +11,40 @@ contextBridge.exposeInMainWorld('appbar', {
     },
     openSector: () => ipcRenderer.invoke(ipcChannel.app.update.prfFile)
 })
-
 contextBridge.exposeInMainWorld('radar', {
     init: function (rootEl: string) {
         const drawer = new Drawer(rootEl);
+        const screenDrawer = document.getElementById('radar-drawer');
         const screen = document.getElementById(elementId.RadarWindow.Canvas.screen);
-        if (!screen) return;
+        if (!screen || !screenDrawer) return;
         screen.addEventListener('wheel', (e) => {
             drawer.UpdateCanvasIndex(e);
         });
-        screen.oncontextmenu = function () {
+        // let movementX: number;
+        // let movementY: number;
+        screen.oncontextmenu = function (ev: MouseEvent) {
+            const distX = ev.clientX - screen.offsetLeft;
+            const distY = ev.clientY - screen.offsetTop;
             screen.onmousemove = function (e) {
-                drawer.UpdateCanvasPosXY(e);
+                const tX= e.clientX - distX;
+                const tY = e.clientY - distY;
+                // movementX = tX;
+                // movementY = tY;
+                screen.style.left = `${tX}px`;
+                screen.style.top = `${tY}px`;
+                drawer.UpdateCanvasPosE(e);
+                // drawer.UpdateCanvasPosE(e);
             }
         };
         screen.onmouseup = function () {
+            // console.log(movement);
+            // drawer.UpdateCanvasPosXY(movement);
+            drawer.ClearCanvas();
+            screen.style.left = '0px';
+            screen.style.top = '45px';
             screen.onmousemove = null;
         };
+
     }
 })
 let isSearchingWx = false
@@ -152,9 +169,21 @@ const aircraftData: {
             ]
         }
     ]
+let obsAcfData = "";
 contextBridge.exposeInMainWorld('acflist', {
+    init: () => {
+        setInterval(() => {
+            ipcRenderer.on(ipcChannel.app.update.obsAcfData, (e, arg) => {
+                obsAcfData = arg
+            })
+        }, 5000)
+    },
     aircraftData: () => {
         return aircraftData
+    },
+    getObsAcfData: () => {
+        ipcRenderer.invoke(ipcChannel.app.update.obsAcfData, "ZYTL");
+        return obsAcfData;
     }
 })
 function getTime() {

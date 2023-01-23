@@ -4,7 +4,7 @@ import { app, protocol, BrowserWindow, Menu, ipcMain, net, dialog } from 'electr
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import path from 'path'
 import ipcChannel from './lib/ipcChannel'
-import { METAR_URL } from './lib/global'
+import { METAR_URL, obsAcfDataApi } from './lib/global'
 import https from 'https'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -94,3 +94,15 @@ if (isDevelopment) {
     })
   }
 }
+ipcMain.handle(ipcChannel.app.update.obsAcfData, (e, args) => {
+  https.get(obsAcfDataApi + args, (res) => {
+    let result = '';
+    res.on('data', (chunk: Buffer) => {
+      result += chunk.toString()
+      
+    })
+    res.on('end', () => {
+      e.sender.send(ipcChannel.app.update.obsAcfData, result)
+    })
+  });
+});

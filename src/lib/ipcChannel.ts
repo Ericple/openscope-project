@@ -13,7 +13,8 @@ export const ipcChannel = {
             theme: "app.toggle.theme",
             themeSystem: "app.toggle.theme.system",
             canvasIndex: "app.update.canvas.index",
-            canvasPos: "app.update.canvas.pos"
+            canvasPos: "app.update.canvas.pos",
+            obsAcfData: "app.update.obsAcfData",
         },
         msg: {
             error: "app.errmsg",

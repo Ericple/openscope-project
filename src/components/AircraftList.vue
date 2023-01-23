@@ -46,6 +46,7 @@ export default defineComponent({
             Lists: (window as any).acflist.aircraftData(),
             activeKey: ref('1'),
             show: true,
+            obsList: (window as any).acflist.getObsAcfData()
         }
     },
     methods: {
@@ -91,7 +92,9 @@ export default defineComponent({
     },
     mounted: function () {
         setInterval(() => {
-            this.Lists = (window as any).acflist.aircraftData()
+            this.Lists = (window as any).acflist.aircraftData();
+            this.obsList = (window as any).acflist.getObsAcfData();
+            console.log(this.obsList)
         }, 5000)
     }
 })

@@ -1,9 +1,9 @@
 <template>
   <AppBar />
-  <RadarScreen />
   <MessageContainer />
   <MetarContainer />
   <DepartureList />
+  <RadarScreen />
 </template>
 
 <script lang="ts">
@@ -45,5 +45,8 @@ body {
 ::-webkit-scrollbar-thumb {
     background-color: #8f8f8f;
     border-radius: 2px;
+}
+.app-bar {
+  z-index: 2;
 }
 </style>

@@ -16,8 +16,10 @@ export default defineComponent({
 .radar {
     position: fixed;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 45px);
+    top: 45px;
     background-color: rgb(32, 32, 32);
+    z-index: 0;
 }
 
 canvas {
