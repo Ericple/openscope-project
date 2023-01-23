@@ -102,6 +102,7 @@ export default defineComponent({
 
 <style scoped>
 .draggable {
+    top: 45px;
     max-height: 600px;
     max-width: 800px;
     position: fixed;

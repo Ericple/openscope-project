@@ -2,6 +2,9 @@ import ipcChannel from '../lib/ipcChannel'
 import { ipcRenderer, contextBridge } from 'electron'
 import Drawer from '../utils/drawer'
 import elementId from '../lib/elementId'
+import path from 'path'
+import fs from 'fs'
+import { DefaultSectorSettingFilePath } from '../lib/global'
 contextBridge.exposeInMainWorld('appbar', {
     quitApp: () => ipcRenderer.invoke(ipcChannel.app.window.close),
     maximizeApp: () => ipcRenderer.invoke(ipcChannel.app.window.maximizeOrRestore),
@@ -11,33 +14,41 @@ contextBridge.exposeInMainWorld('appbar', {
     },
     openSector: () => ipcRenderer.invoke(ipcChannel.app.update.prfFile)
 })
+const drawerGroup: Drawer[] = [];
+const activeDrawerIndex = 0;
 contextBridge.exposeInMainWorld('radar', {
     init: function (rootEl: string) {
-        const drawer = new Drawer(rootEl);
-        const screenDrawer = document.getElementById('radar-drawer');
-        const screen = document.getElementById(elementId.RadarWindow.Canvas.screen);
-        if (!screen || !screenDrawer) return;
+        const drawer = new Drawer(rootEl)
+        drawerGroup.push(drawer)
+        const screen = document.getElementById(elementId.RadarWindow.Canvas.screen)
+        if (!screen) return
         screen.addEventListener('wheel', (e) => {
-            drawer.UpdateCanvasIndex(e);
-        });
+            drawerGroup[activeDrawerIndex].UpdateCanvasIndex(e);
+        })
         screen.oncontextmenu = function (ev: MouseEvent) {
             const distX = ev.clientX - screen.offsetLeft;
             const distY = ev.clientY - screen.offsetTop;
             screen.onmousemove = function (e) {
                 const tX= e.clientX - distX;
                 const tY = e.clientY - distY;
-                screen.style.left = `${tX}px`;
-                screen.style.top = `${tY}px`;
-                drawer.UpdateCanvasPosE(e);
+                screen.style.left = `${tX}px`
+                screen.style.top = `${tY}px`
+                drawerGroup[activeDrawerIndex].UpdateCanvasPosE(e)
             }
-        };
+        }
         screen.onmouseup = function () {
-            drawer.ClearCanvas();
-            screen.style.left = '0px';
-            screen.style.top = '45px';
-            screen.onmousemove = null;
-        };
-
+            drawerGroup[activeDrawerIndex].ClearCanvas();
+            screen.style.left = '0px'
+            screen.style.top = '45px'
+            screen.onmousemove = null
+        }
+        ipcRenderer.on(ipcChannel.app.update.prfFile, (e, args) => {
+            const sectorindicator = document.getElementById(elementId.RadarWindow.Appbar.Tags.currentCoord)
+            if(sectorindicator)sectorindicator.innerText = path.basename(args.path)
+            fs.writeFileSync(DefaultSectorSettingFilePath, args.path, 'utf-8')
+            drawerGroup[activeDrawerIndex].UpdateCache(args.path);
+            drawerGroup[activeDrawerIndex].ClearCanvas();
+        })
     }
 })
 let isSearchingWx = false
