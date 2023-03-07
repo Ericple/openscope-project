@@ -10,7 +10,7 @@ export type Coordinate_A = {
  */
 export type Coordinate_B = {
     latitude: number,
-    longtitude: number
+    longitude: number
 }
 /**
  * 极坐标
@@ -39,7 +39,7 @@ export type AsrSetting = {
 }
 /**
  * asr文件中定义的绘制项
- * @param type indicate the type of item. Possible value contains 
+ * @param type indicate the type of item. Possible value contains
  * `ARTCC low boundary` `Fixes` `Free Text`
  * `Geo` `Regions` `Runways` `Sids` `Stars`
  * `VORs`

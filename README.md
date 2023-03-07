@@ -1,26 +1,26 @@
-<p align=center>
+<p>
   <a href="https://openvmsys.cn/openscope">
     <img alt="openscope" src="https://openvmsys.cn/openscope/img/logo.svg">
   </a>
 </p>
 
-<p align=center>
+<p>
 A cross platform ATC terminal
 </p>
 
-<p align=center>
-  <img src="https://img.shields.io/github/package-json/v/Ericple/openscope-project?style=flat-square">
-  <img src="https://img.shields.io/github/license/Ericple/openscope-project?logo=github&style=flat-square">
-  <img src="https://img.shields.io/github/issues/Ericple/openscope-project?style=flat-square">
-  <img src="https://img.shields.io/github/package-json/dependency-version/Ericple/openscope-project/electron?style=flat-square">
-  <img src="https://img.shields.io/github/stars/Ericple/openscope-project?style=social">
+<p>
+  <img alt="package-version" src="https://img.shields.io/github/package-json/v/Ericple/openscope-project?style=flat-square">
+  <img alt="license-GPL-v3" src="https://img.shields.io/github/license/Ericple/openscope-project?logo=github&style=flat-square">
+  <img alt="issues" src="https://img.shields.io/github/issues/Ericple/openscope-project?style=flat-square">
+  <img alt="dep-version" src="https://img.shields.io/github/package-json/dependency-version/Ericple/openscope-project/electron?style=flat-square">
+  <img alt="stars" src="https://img.shields.io/github/stars/Ericple/openscope-project?style=social">
 </p>
 
 > Openscope is a cross-platform controller terminal for [VATSIM](https://vatsim.net/) FSD Server (not recognized yet) & [TeleFlight Server](https://openvmsys.cn/tfs/#/), supporting Windows / Linux / macOS. I wrote this software mainly for those linux (and of course, macOS!) users who want to be a controller but restricted by windows based Euroscope controller software. I made it open source because I want to grow a community of controller, in which there are men and women full of passion for challenge, and have the courage to break free.
 
-<p align=center>
-<img src="https://img.shields.io/github/v/release/Ericple/openscope-project?include_prereleases&style=for-the-badge">
-<img src="https://img.shields.io/github/downloads/Ericple/openscope-project/total?style=for-the-badge"><br>
+<p>
+<img alt="release" src="https://img.shields.io/github/v/release/Ericple/openscope-project?include_prereleases&style=for-the-badge">
+<img alt="downloads" src="https://img.shields.io/github/downloads/Ericple/openscope-project/total?style=for-the-badge"><br>
 <a href="https://github.com/Ericple/openscope-project/releases/latest" style="position: relative;width:120px;height:40px;border-radius:6px;background-color:rgb(0, 119, 255);color:white;border:none;font-size:16px;top:16px;cursor:pointer;padding:8px 16px 8px 16px">Download</a>
 </p>
 
@@ -59,7 +59,7 @@ npm i && npm run electron:serve
 # FAQ
 
 - How to request metar in openscope?
-  - Use the 
+  - Use the built in metar req.
 
 - How to switch between each sector?
   - Press Shift+Q/W/E/R to switch from these sector views.

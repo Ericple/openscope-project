@@ -1,4 +1,6 @@
 import { Coordinate_B, Coordinate_A, PolarCoordinate } from "./datatype";
+import {EARTH_RADIUS_LONG} from "./global";
+
 
 /**
  * 将B类坐标转换成A类坐标
@@ -7,6 +9,9 @@ import { Coordinate_B, Coordinate_A, PolarCoordinate } from "./datatype";
 export function parse2CoordA(coord: Coordinate_B): Coordinate_A {
     console.log(coord);
     throw "function not implemented";
+}
+export function DegToRad(deg:number){
+    return Math.PI*(deg/180);
 }
 /**
  * 将A类坐标转换成B类坐标
@@ -30,10 +35,10 @@ export function parse2CoordB_(coord: Coordinate_A): Coordinate_B {
             const sec = parseInt(pureLonNumber[2]); const subsec = parseInt(pureLonNumber[3]);
             lonres = deg + min / 60 + (sec + subsec / 1000) / 3600;
         }
-        if(latres == undefined || lonres == undefined) return {latitude:0,longtitude:0}
+        if(latres == undefined || lonres == undefined) return {latitude:0,longitude:0}
         return {
-            latitude: latres,
-            longtitude: lonres
+            latitude: Math.log(Math.tan((Math.PI*0.25)+(0.5*DegToRad(latres))))*EARTH_RADIUS_LONG,
+            longitude: DegToRad(lonres)*EARTH_RADIUS_LONG
         }
     } catch (error) {
         console.log(coord.latitude, coord.longitude);
@@ -46,7 +51,7 @@ export function parse2CoordB(coord: Coordinate_A){
     if(coord.latitude.startsWith("N")) latres = -latres;
     return {
         latitude: latres,
-        longtitude: lonres
+        longitude: lonres
     }
 }
 /**
@@ -56,8 +61,8 @@ export function parse2CoordB(coord: Coordinate_A){
  */
 export function parse2PolarCoord(coord: Coordinate_B): PolarCoordinate {
     return {
-        radius: Math.atan(coord.latitude / coord.longtitude),
-        length: Math.sqrt(coord.latitude ^ 2 + coord.longtitude ^ 2)
+        radius: Math.atan(coord.latitude / coord.longitude),
+        length: Math.sqrt(coord.latitude ^ 2 + coord.longitude ^ 2)
     }
 }
 

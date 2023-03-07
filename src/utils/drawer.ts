@@ -1,14 +1,14 @@
-import { AsrData, EseData, PrfData, SctData } from "../lib/sectortype";
+import { AsrData, EseData, PrfData, SctData } from "@/lib/sectortype";
 import elementId from "../lib/elementId";
 import { LoadAsrFileSync, LoadPrfFileSync, LoadSctFileSync, LoadEseFileSync, ReadPrfData, ConvertEsePath, ReadSctFix, ReadSymbol, ReadEseFreeText, ReadSctGeo, ReadSctRegions, ReadSctDefine, AlignPath, ReadSctLoHiAw, ReadSctAirport, ReadSctVORNDB, ReadSctARTCC, ReadSctSidStar, ReadSctRunway } from "./prfsectorloader";
-import { VoiceData, SymbologyData, ProfileData } from "../lib/settingtype";
+import { VoiceData, SymbologyData, ProfileData } from "@/lib/settingtype";
 import { LoadSymbologySync, LoadVoiceSync, LoadProfileSync } from "./settingloader";
-import { ipcRenderer } from "electron";
-import ipcChannel from "../lib/ipcChannel";
+// import { ipcRenderer } from "electron";
+// import ipcChannel from "../lib/ipcChannel";
 import path from 'path';
-import { SctSIDSTAR, SctVorNdb } from "../lib/datatype";
-import fs from 'fs';
-import { DefaultSectorSettingFilePath } from "../lib/global";
+import { SctSIDSTAR, SctVorNdb } from "@/lib/datatype";
+// import fs from 'fs';
+// import { DefaultSectorSettingFilePath } from "../lib/global";
 
 const SCROLL_INDEX = 1.2;
 const AP_FREETEXT_LIMIT = 20000;//要显示机场FREETEXT的最小缩放倍数
@@ -181,12 +181,12 @@ export class Drawer {
                     this.canvasContext.fillStyle = color;
                     const count = item.coords.length;//获取坐标总数，为for循环做好准备
                     const line = new Path2D();//新建一个二维路径
-                    line.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
+                    line.moveTo(item.coords[0].longitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
                     // this.canvasContext.moveTo(item.coords[0].longtitude * this.canvasIndex, item.coords[0].latitude * this.canvasIndex);
                     for (let index = 1; index < count; index++) {//循环绘制下一个坐标
                         const coord = item.coords[index];
                         // console.log("drawing",coord.longtitude, coord.latitude);
-                        line.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                        line.lineTo(coord.longitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                         // this.canvasContext.lineTo(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                     }
                     // line.moveTo(coord0.longtitude * this.canvasIndex, coord0.latitude * this.canvasIndex);//将二维路径绘制点移动到初始坐标
@@ -210,12 +210,12 @@ export class Drawer {
                 this.canvasContext.fillStyle = symbol.color;
                 if (item.flag == "name") {
                     this.canvasContext.font = symbol.fontSymbolSize * 2.5 + "px Arial";
-                    this.canvasContext.fillText(item.name, coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(item.name, coord.longitude * this.canvasIndex, coord.latitude * this.canvasIndex);
                 }
                 else {
                     //这里的代码后续需要实现DrawScript
                     const size = symbol.fontSymbolSize;
-                    this.canvasContext.fillRect(coord.longtitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size);
+                    this.canvasContext.fillRect(coord.longitude * this.canvasIndex, coord.latitude * this.canvasIndex, size, size);
                 }
             }
             if (item.type == "Geo")//绘制地面线
@@ -229,8 +229,8 @@ export class Drawer {
                     const colorDef = ReadSctDefine(this.sectorCache.definitions, geo.colorFlag);
                     if (!colorDef) return;
                     const line = new Path2D();
-                    line.moveTo(geo.coordA.longtitude * this.canvasIndex, geo.coordA.latitude * this.canvasIndex);
-                    line.lineTo(geo.coordB.longtitude * this.canvasIndex, geo.coordB.latitude * this.canvasIndex);
+                    line.moveTo(geo.coordA.longitude * this.canvasIndex, geo.coordA.latitude * this.canvasIndex);
+                    line.lineTo(geo.coordB.longitude * this.canvasIndex, geo.coordB.latitude * this.canvasIndex);
                     this.canvasContext.strokeStyle = colorDef;
                     this.canvasContext.stroke(line);
                 });
@@ -245,12 +245,12 @@ export class Drawer {
                     const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
                     if (!symbol) return;
                     const line = new Path2D();
-                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
-                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coord.coordA.longitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
+                    line.lineTo(coord.coordB.longitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
                     if (item.flag == "name") {
                         this.canvasContext.fillStyle = symbol.color;
                         this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                        this.canvasContext.fillText(aw.group, (coord.coordA.longtitude * this.canvasIndex + coord.coordB.longtitude * this.canvasIndex) / 2, (coord.coordA.latitude * this.canvasIndex + coord.coordB.latitude * this.canvasIndex) / 2)
+                        this.canvasContext.fillText(aw.group, (coord.coordA.longitude * this.canvasIndex + coord.coordB.longitude * this.canvasIndex) / 2, (coord.coordA.latitude * this.canvasIndex + coord.coordB.latitude * this.canvasIndex) / 2)
                     }
                     else {
                         this.canvasContext.lineWidth = symbol.lineWeight;
@@ -269,12 +269,12 @@ export class Drawer {
                     const symbol = ReadSymbol(this.symbolCache.colors, item.type, item.flag);
                     if (!symbol) return;
                     const line = new Path2D();
-                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
-                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coord.coordA.longitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
+                    line.lineTo(coord.coordB.longitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
                     if (item.flag == "name") {
                         this.canvasContext.fillStyle = symbol.color;
                         this.canvasContext.font = symbol.fontSymbolSize * 3 + "px Arial";
-                        this.canvasContext.fillText(aw.group, (coord.coordA.longtitude * this.canvasIndex + coord.coordB.longtitude * this.canvasIndex) / 2, (coord.coordA.latitude * this.canvasIndex + coord.coordB.latitude * this.canvasIndex) / 2)
+                        this.canvasContext.fillText(aw.group, (coord.coordA.longitude * this.canvasIndex + coord.coordB.longitude * this.canvasIndex) / 2, (coord.coordA.latitude * this.canvasIndex + coord.coordB.latitude * this.canvasIndex) / 2)
                     }
                     else {
                         this.canvasContext.lineWidth = symbol.lineWeight;
@@ -292,13 +292,13 @@ export class Drawer {
                 this.canvasContext.strokeStyle = symbol.color;
                 this.canvasContext.font = symbol.fontSymbolSize * 2.3 + "px Arial";
                 if (item.flag == "name") {
-                    this.canvasContext.fillText(runway.endPointA, runway.coordA.longtitude * this.canvasIndex, runway.coordA.latitude * this.canvasIndex);
-                    this.canvasContext.fillText(runway.endPointB, runway.coordB.longtitude * this.canvasIndex, runway.coordB.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(runway.endPointA, runway.coordA.longitude * this.canvasIndex, runway.coordA.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(runway.endPointB, runway.coordB.longitude * this.canvasIndex, runway.coordB.latitude * this.canvasIndex);
                 }
                 else {
                     const line = new Path2D();
-                    line.moveTo(runway.coordA.longtitude * this.canvasIndex, runway.coordA.latitude * this.canvasIndex);
-                    line.lineTo(runway.coordB.longtitude * this.canvasIndex, runway.coordB.latitude * this.canvasIndex);
+                    line.moveTo(runway.coordA.longitude * this.canvasIndex, runway.coordA.latitude * this.canvasIndex);
+                    line.lineTo(runway.coordB.longitude * this.canvasIndex, runway.coordB.latitude * this.canvasIndex);
                     this.canvasContext.stroke(line);
                 }
             }
@@ -313,11 +313,11 @@ export class Drawer {
                 const size = symbol.fontSymbolSize;
                 this.canvasContext.font = size * 2.3 + "px Arial";
                 if (item.flag == "name") {
-                    this.canvasContext.fillText(vorndb.name, vorndb.coord.longtitude * this.canvasIndex, vorndb.coord.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(vorndb.name, vorndb.coord.longitude * this.canvasIndex, vorndb.coord.latitude * this.canvasIndex);
                 }
                 else {
                     //这里同样要实现绘制脚本
-                    this.canvasContext.fillRect(vorndb.coord.longtitude * this.canvasIndex, vorndb.coord.latitude * this.canvasIndex, size, size)
+                    this.canvasContext.fillRect(vorndb.coord.longitude * this.canvasIndex, vorndb.coord.latitude * this.canvasIndex, size, size)
                 }
             }
             if (item.type == "Airports") {
@@ -329,10 +329,10 @@ export class Drawer {
                 const size = symbol.fontSymbolSize;
                 this.canvasContext.font = size * 2.3 + "px Arial";
                 if (item.flag == "name") {
-                    this.canvasContext.fillText(airport.icao, airport.coord.longtitude * this.canvasIndex, airport.coord.latitude * this.canvasIndex);
+                    this.canvasContext.fillText(airport.icao, airport.coord.longitude * this.canvasIndex, airport.coord.latitude * this.canvasIndex);
                 }
                 else {
-                    this.canvasContext.fillRect(airport.coord.longtitude * this.canvasIndex, airport.coord.latitude * this.canvasIndex, size, size);
+                    this.canvasContext.fillRect(airport.coord.longitude * this.canvasIndex, airport.coord.latitude * this.canvasIndex, size, size);
                 }
             }
             if (item.type == "Free Text")//绘制freetext
@@ -343,7 +343,7 @@ export class Drawer {
                 if (!origincoord) return;
                 if (!symbol) return;
                 this.canvasContext.font = symbol.fontSymbolSize * 3.3 + "px Arial";
-                this.canvasContext.fillText(groupandtext[1], origincoord.longtitude * this.canvasIndex, origincoord.latitude * this.canvasIndex);
+                this.canvasContext.fillText(groupandtext[1], origincoord.longitude * this.canvasIndex, origincoord.latitude * this.canvasIndex);
             }
             if (item.type == "ARTCC boundary") {
                 const artcc = ReadSctARTCC(this.sectorCache.ARTCCs, item.name);
@@ -353,8 +353,8 @@ export class Drawer {
                 this.canvasContext.strokeStyle = symbol.color;
                 artcc.coords.forEach((coord) => {
                     const line = new Path2D();
-                    line.moveTo(coord.coordA.longtitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
-                    line.lineTo(coord.coordB.longtitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coord.coordA.longitude * this.canvasIndex, coord.coordA.latitude * this.canvasIndex);
+                    line.lineTo(coord.coordB.longitude * this.canvasIndex, coord.coordB.latitude * this.canvasIndex);
                     this.canvasContext?.stroke(line);
                 });
             }
@@ -369,8 +369,8 @@ export class Drawer {
                 this.canvasContext.setLineDash([5, 5]);
                 sidstar.coords.forEach((coordpair) => {
                     const line = new Path2D();
-                    line.moveTo(coordpair.coordA.longtitude * this.canvasIndex, coordpair.coordA.latitude * this.canvasIndex);
-                    line.lineTo(coordpair.coordB.longtitude * this.canvasIndex, coordpair.coordB.latitude * this.canvasIndex);
+                    line.moveTo(coordpair.coordA.longitude * this.canvasIndex, coordpair.coordA.latitude * this.canvasIndex);
+                    line.lineTo(coordpair.coordB.longitude * this.canvasIndex, coordpair.coordB.latitude * this.canvasIndex);
                     this.canvasContext?.stroke(line);
                 });
             }
