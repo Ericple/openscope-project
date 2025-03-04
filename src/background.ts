@@ -14,6 +14,8 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 Menu.setApplicationMenu(null);
+const preloadPath = path.join(__dirname, 'preloads', 'preload.js');
+console.log(preloadPath);
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -22,7 +24,7 @@ async function createWindow() {
     frame: false,
     icon: appIcon,
     webPreferences: {
-      preload: path.join(__dirname, 'preloads', 'preload.js')
+      preload: preloadPath
     },
   })
 
@@ -47,6 +49,7 @@ async function createWindow() {
     win.minimize()
   })
   ipcMain.handle(ipcChannel.app.update.prfFile, () => {
+    console.log('Select sector')
     SelectSector();
   })
   ipcMain.handle(ipcChannel.app.func.fetchWeather, (e, args: string) => {
@@ -68,7 +71,7 @@ async function createWindow() {
   const switch2R4 = globalShortcut.register('Shift+R', () => {
     win.webContents.send(ipcChannel.app.func.switchRadarView, 3)
   })
-  if(!switch2R1 || !switch2R2 || !switch2R3 || !switch2R4) new Notification({
+  if (!switch2R1 || !switch2R2 || !switch2R3 || !switch2R4) new Notification({
     title: "An error occured",
     body: "Radar view switcher may not be fully functional",
     icon: appIcon
@@ -118,10 +121,13 @@ ipcMain.handle(ipcChannel.app.update.obsAcfData, (e, args) => {
     let result = '';
     res.on('data', (chunk: Buffer) => {
       result += chunk.toString()
-      
-    })
+
+    });
     res.on('end', () => {
       e.sender.send(ipcChannel.app.update.obsAcfData, result)
-    })
+    });
+    res.on('error', e => {
+      console.error(e);
+    });
   });
 });

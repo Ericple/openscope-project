@@ -91,11 +91,10 @@ export default defineComponent({
         },
     },
     mounted: function () {
-        setInterval(() => {
-            this.Lists = (window as any).acflist.aircraftData();
-            this.obsList = (window as any).acflist.getObsAcfData();
-            console.log(this.obsList)
-        }, 5000)
+        // setInterval(() => {
+        //     this.Lists = (window as any).acflist.aircraftData();
+        //     this.obsList = (window as any).acflist.getObsAcfData();
+        // }, 5000)
     }
 })
 </script>

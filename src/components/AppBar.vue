@@ -86,7 +86,7 @@ export default defineComponent({
     },
     mounted: function () {
         setInterval(() => {
-            this.time = (window as any).appbar.updateTime()
+            // this.time = (window as any).appbar.updateTime()
         }, 1000);
     }
 })

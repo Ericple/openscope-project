@@ -29,7 +29,7 @@ contextBridge.exposeInMainWorld('radar', {
             const distX = ev.clientX - screen.offsetLeft;
             const distY = ev.clientY - screen.offsetTop;
             screen.onmousemove = function (e) {
-                const tX= e.clientX - distX;
+                const tX = e.clientX - distX;
                 const tY = e.clientY - distY;
                 screen.style.left = `${tX}px`
                 screen.style.top = `${tY}px`
@@ -44,14 +44,17 @@ contextBridge.exposeInMainWorld('radar', {
         }
         ipcRenderer.on(ipcChannel.app.update.prfFile, (e, args) => {
             const sectorindicator = document.getElementById(elementId.RadarWindow.Appbar.Tags.currentCoord)
-            if(sectorindicator)sectorindicator.innerText = path.basename(args.path)
+            if (sectorindicator) sectorindicator.innerText = path.basename(args.path)
+            if (!fs.existsSync(DefaultSectorSettingFilePath)) {
+                fs.openSync(DefaultSectorSettingFilePath, 1)
+            }
             fs.writeFileSync(DefaultSectorSettingFilePath, args.path, 'utf-8')
             drawerGroup[activeDrawerIndex].UpdateCache(args.path);
             drawerGroup[activeDrawerIndex].ClearCanvas();
         })
         ipcRenderer.on(ipcChannel.app.func.switchRadarView, (e, args) => {
             //如果所选视图大于已有
-            while(args+1 > drawerGroup.length){
+            while (args + 1 > drawerGroup.length) {
                 drawerGroup.push(new Drawer('radar'))
             }
             drawerGroup.forEach((o) => {
@@ -211,3 +214,4 @@ function getTime() {
     const sec = date.getUTCSeconds().toString().padStart(2, "0")
     return `${month}/${day}/${year} ${hrs}:${min}:${sec}`
 }
+console.log('preloaded')

@@ -34,8 +34,9 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
-, "src/utils/wxfetcher.worker.tsrkersrc/utils/wxfetcher.worker.tscher.worker.ts"  ],
+    "tests/**/*.tsx",
+    "src/utils/wxfetcher.worker.tsrkersrc/utils/wxfetcher.worker.tscher.worker.ts"
+  ],
   "exclude": [
     "node_modules"
   ]
